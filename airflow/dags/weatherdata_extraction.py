@@ -24,7 +24,7 @@ def extractor():
     
     @task(task_id="extract_weather_archive")
     def run_extraction(ds):
-        extractor = GetDatas(ds).get_archive_weather()
+        extractor = GetDatas(ds).get_weather()
         return extractor
 
     run_extraction()

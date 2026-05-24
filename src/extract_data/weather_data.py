@@ -23,8 +23,6 @@ class Weather:
     def __init__(self):
         self.service_check()
 
-
-
     #Change the path depending on the services
     def service_check(self):
         service = os.getenv("SERVICE_NAME", "unknown")
@@ -40,42 +38,29 @@ class Weather:
         return
 
 
-
-    #Load Datas from Open-Meteo API
-    def extract_archive_weather(self, date: str):
+    #Load datas from Open-Meteo API
+    def extract_weather(self, date: str):
         """
         date = 'AAAA-MM-DD'
         """
         self.date = date
 
-        if self.load_arch() is None:
-            return None
+        datas_date = datetime.strptime(self.date, "%Y-%m-%d").date()
+        threshold_date = datetime.now().date() - timedelta(days=4)
 
-        url = "https://archive-api.open-meteo.com/v1/archive"
-        params = {
-            "latitude": self.df_IATA_l_L['Latitude'].to_list(),
-            "longitude": self.df_IATA_l_L['Longitude'].to_list(),
-            "start_date": (datetime.strptime(self.date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d"),
-            "end_date": self.date,
-            "hourly": ["temperature_2m", "wind_speed_100m", "wind_direction_100m", "surface_pressure", "weather_code", "precipitation", "wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "cloud_cover_low", "cloud_cover_mid", "cloud_cover_high"],
-            "timezone": "auto",
-        }
-        self.responses = openmeteo.weather_api(url, params = params)
-        
+        if datas_date <= threshold_date:
+            self.url = "https://archive-api.open-meteo.com/v1/archive"
+        else :
+            self.url = "https://api.open-meteo.com/v1/forecast"
+
         return self.openmeteo_extract()
     
-    def extract_current_weather(self, PARAM: str, IATA: str):
-        '''
-        PARAM = "ARR" or "DEP"
-        IATA = "CDG" for exemple
-        '''
-        self.param = PARAM
-        self.iata = IATA
 
-        if self.load_current() is None:
-            return None
+    def extract_scheduled_weather(self, df_flights: pl.DataFrame):
+        df_IATA = pl.concat([df_flights['Departure_IATA'], df_flights['Arrival_IATA']])
+        self.liste_IATA = df_IATA.unique().to_list()
 
-        url = "https://api.open-meteo.com/v1/forecast"
+        self.url = "https://api.open-meteo.com/v1/forecast"
         params = {
             "latitude": self.df_IATA_l_L['Latitude'].to_list(),
             "longitude": self.df_IATA_l_L['Longitude'].to_list(),
@@ -84,23 +69,32 @@ class Weather:
             "forecast_days": 1,
             "past_days": 1,
         }
-        self.responses = openmeteo.weather_api(url, params = params)
+        self.responses = openmeteo.weather_api(self.url, params = params)
         
-        return self.openmeteo_extract()
+        return self.openmeteo_separate()
     
 
+    def openmeteo_extract(self):
+        if self.load_datas() is None:
+            return None
+
+        params = {
+            "latitude": self.df_IATA_l_L['Latitude'].to_list(),
+            "longitude": self.df_IATA_l_L['Longitude'].to_list(),
+            "start_date": (datetime.strptime(self.date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d"),
+            "end_date": self.date,
+            "hourly": ["temperature_2m", "wind_speed_100m", "wind_direction_100m", "surface_pressure", "weather_code", "precipitation", "wind_gusts_10m", "wind_direction_10m", "wind_speed_10m", "cloud_cover", "cloud_cover_low", "cloud_cover_mid", "cloud_cover_high"],
+            "timezone": "auto",
+        }
+        self.responses = openmeteo.weather_api(self.url, params = params)
+        
+        return self.openmeteo_separate()
 
     #Load flight data file
-    def load_arch(self):
+    def load_datas(self):
         self.file_name = self.date + filename_flight
         self.file_path = os.path.join(self.datas_path, self.file_name)
         return self.loading_datas()
-    
-    def load_current(self):
-        self.file_name = f"{self.param}_{self.iata}.parquet"
-        self.file_path = os.path.join(self.pending_path, self.file_name)
-        return self.loading_datas()
-
 
 
     #Extract IATA list, longitude and latitude
@@ -121,7 +115,7 @@ class Weather:
 
 
     #Transform Open-Meteo data into a data frame
-    def openmeteo_extract(self):
+    def openmeteo_separate(self):
         self.hourly_df = pl.DataFrame()
         for i in range(len(self.responses)):
             response = self.responses[i]

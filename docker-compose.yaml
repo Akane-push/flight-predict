@@ -10,7 +10,9 @@ x-airflow-common: &airflow-common
     - AIRFLOW__CELERY__BROKER_URL=redis://redis:6379/0
     - AIRFLOW__CORE__EXECUTION_API_SERVER_URL=http://airflow-api-server:8080/execution/
     #- AIRFLOW__CORE__INTERNAL_API_URL=http://airflow-api-server:8080/internal-api/v2
-    - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.session
+    - AIRFLOW__FAB__AUTH_TYPE=OAUTH
+    - AIRFLOW__FAB__OAUTH_PROVIDERS=[{"name":"gitlab","token_key":"access_token","remote_app":{"client_id":"${GITLAB_CLIENT_ID:-dummy_id}","client_secret":"${GITLAB_CLIENT_SECRET:-dummy_secret}","api_base_url":"http://gitlab.ton-intranet.local/api/v4/","access_token_url":"http://gitlab.ton-intranet.local/oauth/token","authorize_url":"http://gitlab.ton-intranet.local/oauth/authorize","request_token_params":{"scope":"openid profile email"}}}]
+    - AIRFLOW__API__AUTH_BACKENDS=airflow.providers.fab.auth_manager.api.auth.backend.fab_auth_backend,airflow.api.auth.backend.session
     - AIRFLOW__API_AUTH__JWT_SECRET=${AIRFLOW_API_SECRET}
     - AIRFLOW__API_AUTH__JWT_ISSUER=${AIRFLOW_API_ISSUER}
     - PYTHONPATH=/opt/airflow/
@@ -27,6 +29,8 @@ x-airflow-common: &airflow-common
     - ${ARCHIVES_PATH}:/opt/airflow/archives
     - ${MODEL_PATH}:/opt/airflow/output_model
   user: "${AIRFLOW_UID:-50000}:0"
+  networks:
+  - airflow-network
 
 
 services:
@@ -43,6 +47,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+    - airflow-network
   
   redis:
     image: redis:7.2
@@ -54,6 +60,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+    - airflow-network
   
 
   airflow-init:
@@ -137,3 +145,20 @@ services:
           condition: service_completed_successfully
       airflow-api-server:
           condition: service_started
+
+  api-prod:
+    build: 
+      context: .
+      dockerfile: ./api-prod/Dockerfile
+    ports:
+      - "8081:8000"
+    environment:
+      - AIRFLOW_API_URL=http://airflow-api-server:8080/api/v2
+    env_file:
+      - .env
+    networks:
+      - airflow-network
+
+networks:
+  airflow-network:
+    driver: bridge
