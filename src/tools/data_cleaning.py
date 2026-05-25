@@ -5,7 +5,7 @@ from joblib import load
 pl.Config.set_tbl_cols(26)
 
 class DataCleaning():
-    def __init__(self, df_flight : pl.DataFrame, df_weather : pl.DataFrame):
+    def cleaning(self, df_flight : pl.DataFrame, df_weather : pl.DataFrame):
         '''
         Must include both flight and weather DataFrames (polars format)
         '''
@@ -82,12 +82,20 @@ class DataCleaning():
 
         df_cat_encoded = ordinal_encoder.transform(self.df_final.select(categorical_cols))
         
+        #self.df_final = self.df_final.drop(["Flight_Number"])
         self.encoded_df = pl.concat([self.df_final.select(numerical_cols), df_cat_encoded], how="horizontal").select(sorted(self.df_final.columns))
         
 
-    def get_encoded(self) :
+    def get_encoded(self, df_clean : pl.DataFrame) :
+        self.df_final = df_clean
         self.encoding()
         return self.encoded_df
     
-    def get_dataframe(self) :
+    def get_cleaned(self, df_flight : pl.DataFrame, df_weather : pl.DataFrame) :
+        self.cleaning(df_flight, df_weather)
+        return self.df_final
+    
+    def get_cleaned_encoded(self, df_flight : pl.DataFrame, df_weather : pl.DataFrame) :
+        self.cleaning(df_flight, df_weather)
+        self.encoding()
         return self.df_final

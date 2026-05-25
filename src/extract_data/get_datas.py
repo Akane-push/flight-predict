@@ -3,9 +3,11 @@ import os
 from datetime import datetime
 from src.extract_data.flight_data import LufthansaFly
 from src.extract_data.weather_data import Weather
+from src.tools.data_cleaning import DataCleaning as cl
 
 filename_flight = "_flightdatas.parquet"
 filename_weather = "_weatherdatas.parquet"
+filename_fids = "_FIDS.parquet"
 
 class GetDatas:
     def __init__(self, date: str):
@@ -54,6 +56,36 @@ class GetDatas:
 
         else:
             self.df_flight_list.write_parquet(file_path)
+            print(f"[INFO] Datas are available in the: {file_path} file !")
+
+    #Generate the files for scheduled flights
+    def get_scheduled_flights(self, time: str, PARAM: str, IATA: str):
+        """
+        time = 'HH:MM'
+        """
+        date_time = self.date + "T" + time
+        self.df_flights = LufthansaFly(date_time).extract_scheduled_flights(PARAM, IATA)
+
+        if self.df_flights.is_empty():
+            print("[INFO] No available datas")
+            return
+
+        df_weather = Weather().extract_scheduled_weather(self.date, PARAM, IATA)
+        
+        df_clean = cl().get_cleaned(df_flights, df_weather)
+
+        name_data_file = PARAM + "_" + IATA + "_" + self.date + filename_fids
+        file_path = os.path.join(self.datas_path, name_data_file)
+
+        if os.path.exists(file_path):
+            df_existant = self.pl.read_parquet(file_path)
+            df_final = self.pl.concat([df_existant, self.df_clean], how="vertical")
+            df_final = df_final.unique(subset=["Flight_Number"], keep="last")
+            df_final.write_parquet(file_path)
+            print(f"[INFO] Datas are added in the: {file_path} file !")
+
+        else:
+            self.df_clean.write_parquet(file_path)
             print(f"[INFO] Datas are available in the: {file_path} file !")
 
     #Generate the files for weather
