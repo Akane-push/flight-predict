@@ -29,12 +29,12 @@ Le système intègrera un pipeline ELT orchestré par Airflow, un stockage au fo
 - [x] Entraînement du modèle avec scikit-learn
 
 ### Phase 2:
-- [ ] FastAPI - Core (API Prod)
+- [x] FastAPI - Core (API Prod)
 - [ ] FastAPI - Prédiction (API Predict)
 - [ ] FastAPI - Démo (API Demo)
 
 ### Phase 3:
-- [ ] Pipeline CI
+- [x] Pipeline CI
 - [ ] Kubernetes
 - [ ] Monitoring (Prometheus + Grafana)
 - [ ] Pipeline CD

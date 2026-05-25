@@ -27,7 +27,7 @@ class LufthansaAPI:
             print("[INFO] Successfully authenticated with Lufthansa API.")
             return self.token
         else:
-            raise ValueError(f"[ERROR] : {response.status_code} - {response.text}")
+            raise PermissionError(f"[ERROR] : {response.status_code} - {response.text}")
 
 
 

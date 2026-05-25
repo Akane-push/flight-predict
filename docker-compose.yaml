@@ -159,6 +159,15 @@ services:
     networks:
       - airflow-network
 
+  api-predict:
+    build: 
+      context: .
+      dockerfile: ./api-predict/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+
 networks:
   airflow-network:
     driver: bridge
