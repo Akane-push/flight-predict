@@ -18,10 +18,10 @@ class XGBGridSearch():
         df_flights = self.pl.read_parquet(f"{datas_path}/*{filename_flight}")
         df_weather = self.pl.read_parquet(f"{datas_path}/*{filename_weather}")
 
-        if self.df_flights.is_empty():
+        if df_flights.is_empty():
             raise ValueError("[WARNING] No available flight datas")
         
-        elif self.df_weather.is_empty():
+        elif df_weather.is_empty():
             raise ValueError("[WARNING] No available weather datas")
     
         df_clean = cl().get_cleaned(df_flights, df_weather)
