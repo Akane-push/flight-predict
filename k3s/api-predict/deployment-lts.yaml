@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-prod
+  namespace: flight-predict
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-prod
+      version: lts
+  template:
+    metadata:
+      labels:
+        app: api-prod
+        version: lts
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry
+      nodeSelector:
+        polars-compatible: "true"
+      containers:
+      - name: api-lanceur
+        image: registry.gitlab.com/Akane-Push/flight-predict/api-prod:latest-lts
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: EXTRACTED_PATH
+          value: /app/extracted
+        - name: PENDING_PATH
+          value: /app/pending
+        - name: ARCHIVES_PATH
+          value: /app/archives
+        - name: MODEL_PATH
+          value: /app/output_model
+        envFrom:
+        - secretRef:
+            name: lufth-credentials
+        volumeMounts:
+        - name: common-data
+          mountPath: /app/extracted
+          subPath: Weekly
+        - name: common-data
+          mountPath: /app/pending
+          subPath: Pending
+        - name: common-data
+          mountPath: /app/archives
+          subPath: Archives
+        - name: common-data
+          mountPath: /app/output_model
+          subPath: Model
+      volumes:
+        - name: common-data
+          persistentVolumeClaim:
+            claimName: data-pvc

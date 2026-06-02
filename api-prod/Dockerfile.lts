@@ -10,12 +10,11 @@ RUN useradd -m apiuser
 WORKDIR /app
 
 COPY --chown=apiuser:apiuser pyproject.toml ./
-COPY --chown=apiuser:apiuser install_polars.sh ./
 COPY --chown=apiuser:apiuser src/ ./src/
 
-COPY --chown=apiuser:apiuser ./api-predict/ .
+COPY --chown=apiuser:apiuser ./api-prod/ .
 
-RUN pip install polars
+RUN pip install polars[rtcompat]
 RUN pip install ".[api]"
 
 USER apiuser
