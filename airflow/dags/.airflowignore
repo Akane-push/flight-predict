@@ -1,2 +1,2 @@
-\.git/
-\.worktrees/
+.git
+.worktrees
