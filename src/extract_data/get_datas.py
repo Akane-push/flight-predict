@@ -5,6 +5,10 @@ from src.extract_data.flight_data import LufthansaFly
 from src.extract_data.weather_data import Weather
 from src.tools.data_cleaning import DataCleaning as cl
 
+from dotenv import load_dotenv
+load_dotenv()
+datas_path = os.getenv("EXTRACTED_PATH")
+
 filename_flight = "_flightdatas.parquet"
 filename_weather = "_weatherdatas.parquet"
 filename_fids = "_FIDS.parquet"
@@ -17,21 +21,6 @@ class GetDatas:
         import polars as pl
         self.pl = pl
         self.date = date
-        self.datas_path = self.service_check()
-
-    #Change the path depending on the services
-    def service_check(self):
-        from dotenv import load_dotenv
-        load_dotenv()
-        service = os.getenv("SERVICE_NAME", "unknown")
-
-        if service == "airflow":
-            return "/opt/airflow/output"
-        
-        else:
-            #Loading required files
-            return os.getenv("Datas_path")
-
 
     #Generate the files for flight
     def get_flights(self, time: str):
@@ -46,7 +35,7 @@ class GetDatas:
             return
 
         name_data_file = self.date + filename_flight
-        file_path = os.path.join(self.datas_path, name_data_file)
+        file_path = os.path.join(datas_path, name_data_file)
 
         if os.path.exists(file_path):
             df_existant = self.pl.read_parquet(file_path)
@@ -75,7 +64,7 @@ class GetDatas:
         df_clean = cl().get_cleaned(df_flights, df_weather)
 
         name_data_file = PARAM + "_" + IATA + "_" + self.date + filename_fids
-        file_path = os.path.join(self.datas_path, name_data_file)
+        file_path = os.path.join(datas_path, name_data_file)
 
         if os.path.exists(file_path):
             df_existant = self.pl.read_parquet(file_path)
@@ -104,7 +93,7 @@ class GetDatas:
             return
             
         name_data_file = self.date + filename_weather
-        file_path = os.path.join(self.datas_path, name_data_file)
+        file_path = os.path.join(datas_path, name_data_file)
 
         self.df_weather.write_parquet(file_path)
         print(f"[INFO] Datas are available in the: {file_path} file !")

@@ -2,7 +2,7 @@
 name = "mon-projet-global"
 version = "0.1.0"
 package-mode = true
-packages = [{include = "*", from = "src"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
@@ -25,10 +25,11 @@ apache-airflow = { version = "3.2.0", optional = true }
 apache-airflow-task-sdk = { version = "1.2.0", optional = true }
 apache-airflow-providers-fab = { version = ">=1.5.0", optional = true }
 airflow-serde-polars = { git = "https://github.com/phi-friday/airflow-serde-polars.git", branch = "main", optional = true }
-urllib3 = { version = "<2.0.0", optional = true }
+urllib3 = { version = "2.6.3", optional = true }
+apache-airflow-providers-cncf-kubernetes = { version = "10.17.0", optional = true }
 
 [tool.poetry.extras]
-airflow = ["apache-airflow", "apache-airflow-task-sdk", "apache-airflow-providers-fab", "airflow-serde-polars", "urllib3"]
+airflow = ["apache-airflow", "apache-airflow-task-sdk", "apache-airflow-providers-fab", "airflow-serde-polars", "urllib3", "apache-airflow-providers-cncf-kubernetes"]
 api = ["fastapi", "uvicorn", "httpx"]
 
 [build-system]
