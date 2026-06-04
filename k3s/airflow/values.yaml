@@ -1,0 +1,154 @@
+# Airflow 3 Celery ================================================
+executor: "CeleryExecutor"
+airflowVersion: "3.2.0"
+config:
+  core:
+    dags_folder: "/opt/airflow/dags"
+    PYTHONPATH: "/opt/airflow:/opt/airflow/src"
+    load_examples: "False"
+  auth_manager:
+    auth_manager_class: "airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager"
+
+createUserJob:
+  enabled: false
+
+redis:
+  enabled: true
+
+uid: 50000
+gid: 0
+
+securityContext:
+  runAsUser: 50000
+  fsGroup: 50000
+
+
+# Database  ================================================
+postgresql:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClassName: "local-storage-db"
+    size: "10Gi"
+
+
+# Images Configuration ================================================
+images:
+  airflow:
+    repository: "registry.gitlab.com/akane-push/flight-predict/airflow"
+    tag: "vtest-1.5"
+    pullPolicy: "Always"
+
+imagePullSecrets:
+  - name: "gitlab-registry-credentials"
+
+
+# Airflow 3 Architecture ================================================
+webserver:
+  enabled: false
+
+apiServer:
+  replicas: 2
+  service:
+    type: NodePort
+    ports:
+      - name: air-api-http
+        port: 8080
+        targetPort: 8080
+        nodePort: 32080
+
+scheduler:
+  replicas: 2
+  logGroomerSidecar:
+    enabled: false
+    command: null
+
+dagProcessor:
+  replicas: 2
+  logGroomerSidecar:
+    enabled: false
+    command: null
+
+
+# Worker Config ================================================
+worker:
+  enabled: true
+  replicas: 3
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+
+# DAGS ================================================
+dags:
+  gitSync:
+    enabled: false
+    #repo: "https://gitlab.com/akane-push/flight-predict.git"
+    #subPath: "airflow/dags"
+    #branch: "id_config"
+    #rev: "HEAD"
+    #depth: 1
+    #wait: 300
+    #credentialsSecret: "gitlab-http-credentials"
+  persistence:
+    enabled: false
+
+dagProcessor:
+  enabled: true
+
+
+# Local Logs STORAGE & Volumes Mounts ================================================
+logs:
+  persistence:
+    enabled: true
+    existingClaim: "data-pvc"
+    subPath: "logs"
+
+volumes:
+  - name: common-data
+    persistentVolumeClaim:
+      claimName: "data-pvc"
+
+volumeMounts:
+  - name: common-data
+    mountPath: "/opt/airflow/output"
+    subPath: "Weekly"
+  - name: common-data
+    mountPath: "/opt/airflow/pending"
+    subPath: "Pending"
+  - name: common-data
+    mountPath: "/opt/airflow/archives"
+    subPath: "Archives"
+  - name: common-data
+    mountPath: "/opt/airflow/output_model"
+    subPath: "Model"
+
+
+# Env ================================================
+secret:
+  - envName: "Lufth_client_id"
+    secretName: "lufth-credentials"
+    secretKey: "Lufth_client_id"
+  - envName: "Lufth_client_secret"
+    secretName: "lufth-credentials"
+    secretKey: "Lufth_client_secret"
+  - envName: "Lufth_grant_type"
+    secretName: "lufth-credentials"
+    secretKey: "Lufth_grant_type"
+
+env:
+  - name: "EXTRACTED_PATH"
+    value: "/opt/airflow/output"
+  - name: "PENDING_PATH"
+    value: "/opt/airflow/pending"
+  - name: "ARCHIVES_PATH"
+    value: "/opt/airflow/archives"
+  - name: "MODEL_PATH"
+    value: "/opt/airflow/output_model"
+
+envFrom:
+  - secretRef:
+      name: "lufth-credentials"
+  - secretRef:
+      name: "airflow-admin-credentials"
