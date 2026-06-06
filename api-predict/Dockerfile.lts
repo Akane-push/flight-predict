@@ -10,7 +10,6 @@ RUN useradd -m apiuser
 WORKDIR /app
 
 COPY --chown=apiuser:apiuser pyproject.toml ./
-COPY --chown=apiuser:apiuser install_polars.sh ./
 COPY --chown=apiuser:apiuser src/ ./src/
 
 COPY --chown=apiuser:apiuser ./api-predict/ .
@@ -22,4 +21,4 @@ USER apiuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]

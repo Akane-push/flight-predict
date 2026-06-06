@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-predict
-  namespace: flight-predict
+  namespace: flight-project
 spec:
   replicas: 1
   selector:
@@ -21,10 +21,10 @@ spec:
         polars-compatible: "true"
       containers:
       - name: api-predict
-        image: registry.gitlab.com/Akane-Push/flight-predict/api-predict:test-latest
+        image: registry.gitlab.com/akane-push/flight-predict/api-predict:test-latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8000
+        - containerPort: 8001
         env:
         - name: EXTRACTED_PATH
           value: /app/extracted

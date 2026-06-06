@@ -8,6 +8,7 @@ spec:
     app: api-predict
   ports:
     - protocol: TCP
-      port: 8000
-      targetPort: 32000
+      nodePort: 32001
+      targetPort: 8001
+      port: 8001
   type: LoadBalancer
