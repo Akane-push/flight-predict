@@ -14,7 +14,6 @@ COPY --chown=apiuser:apiuser src/ ./src/
 
 COPY --chown=apiuser:apiuser ./api-prod/ .
 
-RUN pip install polars
 RUN pip install ".[api]"
 
 USER apiuser

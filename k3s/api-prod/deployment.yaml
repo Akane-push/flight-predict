@@ -8,17 +8,15 @@ spec:
   selector:
     matchLabels:
       app: api-prod
-      version: with-polars
+      version: latest
   template:
     metadata:
       labels:
         app: api-prod
-        version: with-polars
+        version: latest
     spec:
       imagePullSecrets:
         - name: gitlab-registry
-      nodeSelector:
-        polars-compatible: "true"
       containers:
       - name: api-prod
         image: registry.gitlab.com/akane-push/flight-predict/api-prod:test-latest
@@ -27,7 +25,7 @@ spec:
         - containerPort: 8081
         env:
         - name: AIRFLOW_API_URL
-          value: http://airflow-api-server:32080/api/v2
+          value: "http://airflow-api-server:8080"
         - name: EXTRACTED_PATH
           value: /app/extracted
         - name: PENDING_PATH

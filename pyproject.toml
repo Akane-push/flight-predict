@@ -17,9 +17,10 @@ requests-cache = "*"
 retry-requests = "*"
 openmeteo-requests = "*"
 dotenv = "*"
-fastapi = "*"
-uvicorn = "*"
-httpx = "*"
+
+fastapi = { version = "*", optional = true }
+uvicorn = { version = "*", optional = true }
+httpx = { version = "*", optional = true }
 
 apache-airflow = { version = "3.2.0", optional = true }
 apache-airflow-task-sdk = { version = "1.2.0", optional = true }

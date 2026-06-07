@@ -286,7 +286,7 @@ tz = ["tzdata"]
 name = "annotated-doc"
 version = "0.0.4"
 description = "Document parameters, class attributes, return types, and variables inline, with Annotated."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -299,7 +299,7 @@ files = [
 name = "annotated-types"
 version = "0.7.0"
 description = "Reusable constraint types to use with typing.Annotated"
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -312,7 +312,7 @@ files = [
 name = "anyio"
 version = "4.13.0"
 description = "High-level concurrency and networking framework on top of asyncio or Trio"
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -1200,7 +1200,7 @@ files = [
 name = "click"
 version = "8.3.3"
 description = "Composable command line interface toolkit"
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -1216,7 +1216,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
-optional = false
+optional = true
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 groups = ["main"]
 markers = "(platform_system == \"Windows\" or extra == \"airflow\") and (extra == \"api\" or extra == \"airflow\")"
@@ -1452,7 +1452,7 @@ idna = ">=2.0.0"
 name = "fastapi"
 version = "0.136.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -2114,7 +2114,7 @@ files = [
 name = "httpcore"
 version = "1.0.9"
 description = "A minimal low-level HTTP client."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -2191,7 +2191,7 @@ files = [
 name = "httpx"
 version = "0.28.1"
 description = "The next generation HTTP client."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -4214,7 +4214,7 @@ files = [
 name = "pydantic"
 version = "2.13.3"
 description = "Data validation using Python type hints"
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -4237,7 +4237,7 @@ timezone = ["tzdata ; python_version >= \"3.9\" and platform_system == \"Windows
 name = "pydantic-core"
 version = "2.46.3"
 description = "Core functionality for Pydantic validation and serialization"
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -5506,7 +5506,7 @@ doc = ["sphinx"]
 name = "starlette"
 version = "0.52.1"
 description = "The little ASGI library that shines."
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -5666,7 +5666,7 @@ files = [
 name = "typing-inspection"
 version = "0.4.2"
 description = "Runtime typing introspection tools"
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -5807,7 +5807,7 @@ files = [
 name = "uvicorn"
 version = "0.46.0"
 description = "The lightning-fast ASGI server."
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"api\" or extra == \"airflow\""
@@ -6462,4 +6462,4 @@ api = ["fastapi", "httpx", "uvicorn"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "31b397d9b300ac26f4b05d11745e596bf73bd8b62c029058183769a1f045005e"
+content-hash = "1efa7de35c14e43b3d9db62f9504e5f07c0c58da44c559dbdca95893fedd9248"
