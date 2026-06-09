@@ -11,7 +11,12 @@ from datetime import datetime, timedelta
 current_folder = os.path.dirname(__file__)
 path = os.path.join(current_folder, "..", "reference_data", "airports_references.parquet")
 df_IATA_refs = pl.read_parquet(path)
+
+from dotenv import load_dotenv
 load_dotenv()
+datas_path = os.getenv("EXTRACTED_PATH")
+pending_path = os.getenv("PENDING_PATH")
+
 filename_flight = "_flightdatas.parquet"
 
 #Open-Meteo config
@@ -20,24 +25,6 @@ retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
 class Weather:
-    def __init__(self):
-        self.service_check()
-
-    #Change the path depending on the services
-    def service_check(self):
-        service = os.getenv("SERVICE_NAME", "unknown")
-
-        if service == "airflow":
-            self.datas_path = "/opt/airflow/output"
-            self.pending_path = "/opt/airflow/pending"
-        
-        else:
-            self.datas_path = os.getenv("Datas_path")
-            self.pending_path = os.getenv("Pending_path")
-        
-        return
-
-
     #Load datas from Open-Meteo API
     def extract_weather(self, date: str):
         """
@@ -93,7 +80,7 @@ class Weather:
     #Load flight data file
     def load_datas(self):
         self.file_name = self.date + filename_flight
-        self.file_path = os.path.join(self.datas_path, self.file_name)
+        self.file_path = os.path.join(datas_path, self.file_name)
         return self.loading_datas()
 
 

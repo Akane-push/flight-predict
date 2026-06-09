@@ -1,0 +1,9 @@
+# Airflow 3 Architecture ================================================
+apiServer:
+  replicas: 1
+
+scheduler:
+  replicas: 1
+
+worker:
+  replicas: 1

@@ -14,7 +14,7 @@ COPY --chown=apiuser:apiuser src/ ./src/
 
 COPY --chown=apiuser:apiuser ./api-predict/ .
 
-RUN pip install polars
+RUN pip install polars[rtcompat]
 RUN pip install ".[api]"
 
 USER apiuser

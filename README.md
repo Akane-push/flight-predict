@@ -2,7 +2,7 @@
 
 Projet personnel de Data Engineering visant à concevoir une architecture de prédiction de retards de vols (Lufthansa, vols directs).
 
-Ce dépôt est un miroir du projet principal hébergé sur [GitLab](https://gitlab.com/Akane-Push/flight-predict)
+Le dépôt Github est un miroir du projet principal hébergé sur [GitLab](https://gitlab.com/Akane-Push/flight-predict)
 
 ## Objectif
 
@@ -54,20 +54,23 @@ Lufth_client_secret=VOTRE_CLIENT_SECRET
 Lufth_grant_type=client_credentials
 
 # --- Base de données PostgreSQL pour Airflow ---
-POSTGRES_USER=votre_user
-POSTGRES_PASSWORD=votre_mot_de_passe_fort
+POSTGRES_USER=
+POSTGRES_PASSWORD=
 
 # --- Airflow ---
-AIRFLOW_USER=votre_user
-AIRFLOW_PASSWORD=votre_mot_de_passe_fort
-AIRFLOW_LOGS_PATH=./airflow/logs
-AIRFLOW_API_ISSUER=votre_issuer
-AIRFLOW_API_SECRET=votre_secret_fort
-AIRFLOW_UID=1000
+AIRFLOW_USER=admin
+AIRFLOW_PASSWORD=admin
+AIRFLOW_LOGS_PATH=
+AIRFLOW_API_ISSUER=
+AIRFLOW_API_SECRET=
+AIRFLOW_UID=50000 # Évitez l'erreur ModuleNotFoundError/PermissionError lors des imports Python (urllib3).
+
+# --- Config ---
+DOCKERFILE=Dockerfile.lts # Retirez le ".lts" uniquement si votre processeur est compatible avec le langage Rust
 
 # --- Chemins de stockage ---
-EXTRACTED_PATH=./chemin_absolu_vers_votre_dossier/datas
-PENDING_PATH=./chemin_absolu_vers_votre_dossier/pending
-ARCHIVES_PATH=./chemin_absolu_vers_votre_dossier/archives
-MODEL_PATH=./chemin_absolu_vers_votre_dossier/model
+EXTRACTED_PATH=./datas/extracted
+PENDING_PATH=./datas/pending
+ARCHIVES_PATH=./datas/archives
+MODEL_PATH=./datas/model
 ```

@@ -2,7 +2,7 @@ FROM apache/airflow:3.2.0-python3.11
 
 USER airflow
 
-RUN pip install polars
+RUN pip install polars[rtcompat]
 
 COPY --chown=airflow:root pyproject.toml ./
 COPY --chown=airflow:root src/ /opt/airflow/src/

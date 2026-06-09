@@ -1,7 +1,7 @@
 x-airflow-common: &airflow-common
   build: 
     context: .
-    dockerfile: ./airflow/Dockerfile
+    dockerfile: ./airflow/${DOCKERFILE:-Dockerfile.lts}
   environment:
     - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
     - AIRFLOW__CORE__AUTH_MANAGER=airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
@@ -11,23 +11,26 @@ x-airflow-common: &airflow-common
     - AIRFLOW__CORE__EXECUTION_API_SERVER_URL=http://airflow-api-server:8080/execution/
     #- AIRFLOW__CORE__INTERNAL_API_URL=http://airflow-api-server:8080/internal-api/v2
     - AIRFLOW__FAB__AUTH_TYPE=OAUTH
-    - AIRFLOW__FAB__OAUTH_PROVIDERS=[{"name":"gitlab","token_key":"access_token","remote_app":{"client_id":"${GITLAB_CLIENT_ID:-dummy_id}","client_secret":"${GITLAB_CLIENT_SECRET:-dummy_secret}","api_base_url":"http://gitlab.ton-intranet.local/api/v4/","access_token_url":"http://gitlab.ton-intranet.local/oauth/token","authorize_url":"http://gitlab.ton-intranet.local/oauth/authorize","request_token_params":{"scope":"openid profile email"}}}]
+    #- AIRFLOW__FAB__OAUTH_PROVIDERS=[{"name":"gitlab","token_key":"access_token","remote_app":{"client_id":"${GITLAB_CLIENT_ID:-dummy_id}","client_secret":"${GITLAB_CLIENT_SECRET:-dummy_secret}","api_base_url":"http://gitlab.ton-intranet.local/api/v4/","access_token_url":"http://gitlab.ton-intranet.local/oauth/token","authorize_url":"http://gitlab.ton-intranet.local/oauth/authorize","request_token_params":{"scope":"openid profile email"}}}]
     - AIRFLOW__API__AUTH_BACKENDS=airflow.providers.fab.auth_manager.api.auth.backend.fab_auth_backend,airflow.api.auth.backend.session
-    - AIRFLOW__API_AUTH__JWT_SECRET=${AIRFLOW_API_SECRET}
-    - AIRFLOW__API_AUTH__JWT_ISSUER=${AIRFLOW_API_ISSUER}
-    - PYTHONPATH=/opt/airflow/
+    - AIRFLOW__API_AUTH__JWT_SECRET=${AIRFLOW_API_SECRET:-secret}
+    - AIRFLOW__API_AUTH__JWT_ISSUER=${AIRFLOW_API_ISSUER:-issuser}
+    - PYTHONPATH=/opt/airflow:/opt/airflow/src
     - SERVICE_NAME=airflow
     - TZ=Europe/Paris
+    - EXTRACTED_PATH=/opt/airflow/output
+    - PENDING_PATH=/opt/airflow/pending
+    - ARCHIVES_PATH=/opt/airflow/archives
+    - MODEL_PATH=/opt/airflow/output_model
   env_file:
     - .env
   volumes:
-    - ./airflow/dags:/opt/airflow/dags
-    - ./src:/opt/airflow/src
-    - ${AIRFLOW_LOGS_PATH}:/opt/airflow/logs
-    - ${EXTRACTED_PATH}:/opt/airflow/output
-    - ${PENDING_PATH}:/opt/airflow/pending
-    - ${ARCHIVES_PATH}:/opt/airflow/archives
-    - ${MODEL_PATH}:/opt/airflow/output_model
+    #- ./src:/opt/airflow/src
+    - ${AIRFLOW_LOGS_PATH:-./airflows/logs}:/opt/airflow/logs
+    - ${EXTRACTED_PATH:-./datas/extracted}:/opt/airflow/output
+    - ${PENDING_PATH:-./datas/pending}:/opt/airflow/pending
+    - ${ARCHIVES_PATH:-./datas/archives}:/opt/airflow/archives
+    - ${MODEL_PATH:-./datas/model}:/opt/airflow/output_model
   user: "${AIRFLOW_UID:-50000}:0"
   networks:
   - airflow-network
@@ -40,8 +43,6 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=airflow
-    env_file:
-      - .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d airflow"]
       interval: 10s
@@ -151,9 +152,9 @@ services:
       context: .
       dockerfile: ./api-prod/Dockerfile
     ports:
-      - "8081:8000"
+      - "8081:8081"
     environment:
-      - AIRFLOW_API_URL=http://airflow-api-server:8080/api/v2
+      - AIRFLOW_API_URL=http://airflow-api-server:8080
     env_file:
       - .env
     networks:
@@ -162,11 +163,12 @@ services:
   api-predict:
     build: 
       context: .
-      dockerfile: ./api-predict/Dockerfile
+      dockerfile: ./api-predict/${DOCKERFILE:-Dockerfile.lts}
     ports:
-      - "8000:8000"
+      - "8001:8001"
     env_file:
-      - .env
+      - path: .env
+        required: false
 
 networks:
   airflow-network:
