@@ -10,7 +10,7 @@
   - helm repo add apache-airflow https://airflow.apache.org
   - helm repo update
 
-  - HELM_CMD="helm upgrade --install airflow apache-airflow/airflow --version '1.21.0' --namespace flight-project --create-namespace -f k3s/airflow/values.yaml"
+  - HELM_CMD="helm upgrade --install airflow apache-airflow/airflow --version 1.21.0 --namespace flight-project --create-namespace -f k3s/airflow/values.yaml"
   - |
     if [ "$CI_COMMIT_BRANCH" = "test_kube" ]; then
       HELM_CMD="$HELM_CMD -f values-test.yaml"
