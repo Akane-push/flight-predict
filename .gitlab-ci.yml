@@ -89,10 +89,8 @@ check-env_job:
   image: 
     name: bitnami/kubectl:latest
     entrypoint: [""]
-  before_script:
-    - mkdir -p ~/.kube
-    - echo "$KUBECONFIG_CONTENT" > ~/.kube/config
   script:
+  - export KUBECONFIG="$KUBECONFIG_CONTENT"
   - NODES_FOUND=$(kubectl get nodes -l feature.node.kubernetes.io/rust=true -o jsonpath='{.items[*].metadata.name}')
   - |
     if [ -z "$NODES_FOUND" ]; then
