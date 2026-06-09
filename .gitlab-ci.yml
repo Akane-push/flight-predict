@@ -7,6 +7,9 @@
   - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/api-predict/deployment.yaml.template > k3s/api-predict/deployment.yaml
   - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/api-prod/deployment.yaml.template > k3s/api-prod/deployment.yaml
 
+  - helm repo add apache-airflow https://airflow.apache.org
+  - helm repo update
+
   - HELM_CMD="helm upgrade --install airflow apache-airflow/airflow --version '1.21.0' --namespace flight-project --create-namespace -f k3s/airflow/values.yaml"
   - |
     if [ "$CI_COMMIT_BRANCH" = "test_kube" ]; then
