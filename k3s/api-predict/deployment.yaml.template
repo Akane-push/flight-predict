@@ -1,27 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-predict-lts
+  name: api-predict
   namespace: flight-project
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: api-predict
-      version: lts
+      version: ${VERSION_TAG}
   template:
     metadata:
       labels:
         app: api-predict
-        version: lts
+        version: ${VERSION_TAG}
     spec:
       imagePullSecrets:
         - name: gitlab-registry
-      nodeSelector:
-        polars-compatible: "false"
       containers:
-      - name: api-lanceur
-        image: registry.gitlab.com/akane-push/flight-predict/api-predict:vtest-0.1
+      - name: api-predict
+        image: registry.gitlab.com/akane-push/flight-predict/api-predict:${VERSION_TAG}${ENV_TAG}
         imagePullPolicy: Always
         ports:
         - containerPort: 8001

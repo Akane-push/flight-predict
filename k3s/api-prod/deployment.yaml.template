@@ -8,18 +8,18 @@ spec:
   selector:
     matchLabels:
       app: api-prod
-      version: latest
+      version: ${VERSION_TAG}
   template:
     metadata:
       labels:
         app: api-prod
-        version: latest
+        version: ${VERSION_TAG}
     spec:
       imagePullSecrets:
         - name: gitlab-registry
       containers:
       - name: api-prod
-        image: registry.gitlab.com/akane-push/flight-predict/api-prod:test-latest
+        image: registry.gitlab.com/akane-push/flight-predict/api-prod:${VERSION_TAG}${ENV_TAG}
         imagePullPolicy: Always
         ports:
         - containerPort: 8081

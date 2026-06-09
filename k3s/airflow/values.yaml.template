@@ -36,7 +36,7 @@ postgresql:
 images:
   airflow:
     repository: "registry.gitlab.com/akane-push/flight-predict/airflow"
-    tag: "vtest-1.5"
+    tag: "${VERSION_TAG}${ENV_TAG}"
     pullPolicy: "Always"
 
 imagePullSecrets:
