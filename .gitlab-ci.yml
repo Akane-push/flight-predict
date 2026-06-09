@@ -90,9 +90,6 @@ check-env_job:
   - if: $CI_COMMIT_BRANCH == "main"
     tags:
       - runner-prod
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
   script:
   - export KUBECONFIG="$KUBECONFIG_CONTENT"
   - NODES_FOUND=$(kubectl get nodes -l feature.node.kubernetes.io/rust=true -o jsonpath='{.items[*].metadata.name}')
