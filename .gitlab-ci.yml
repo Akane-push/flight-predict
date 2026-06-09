@@ -140,7 +140,7 @@ deploy_to_prod:
   stage: deploy-prod
   needs:
     - job: build_job
-    - job: ccheck-processor-prod
+    - job: check-processor-prod
       artifacts: true
   dependencies:
     - check-processor-test
