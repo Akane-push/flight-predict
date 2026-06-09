@@ -1,5 +1,7 @@
 .init-deploy-kube:
   script:
+  - export KUBECONFIG="$KUBECONFIG_CONTENT"
+  
   - if [ -f build.env ]; then export $(xargs < build.env); fi
   - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/airflow/values.yaml.template > k3s/airflow/values.yaml
   - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/api-predict/deployment.yaml.template > k3s/api-predict/deployment.yaml
