@@ -86,6 +86,9 @@ check-env_job:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "test_kube"
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
   - NODES_FOUND=$(kubectl get nodes -l feature.node.kubernetes.io/rust=true -o jsonpath='{.items[*].metadata.name}')
   - |
