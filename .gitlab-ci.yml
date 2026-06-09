@@ -18,6 +18,18 @@
   - kubectl apply -f k3s/api-predict/deployment.yaml
   - kubectl apply -f k3s/api-prod/deployment.yaml
 
+.sript-check-processor:
+  script:
+  - export KUBECONFIG="$KUBECONFIG_CONTENT"
+  - NODES_FOUND=$(kubectl get nodes -l feature.node.kubernetes.io/rust=true -o jsonpath='{.items[*].metadata.name}')
+  - |
+    if [ -z "$NODES_FOUND" ]; then
+      echo "ENV_TAG=-lts" >> build.env
+    else
+      echo "ENV_TAG=" >> build.env
+    fi
+  - echo "VERSION_TAG=$VERSION_TAG" >> build.env
+
 # Config  ================================================
 stages:
   - build
@@ -81,25 +93,26 @@ build_job:
 
 
 # Check env  ================================================
-check-env_job:
+check-processor-test:
   stage: check-env
   rules:
-  - if: $CI_COMMIT_BRANCH == "test_kube"
-    tags:
-      - runner-test-kube
-  - if: $CI_COMMIT_BRANCH == "main"
-    tags:
-      - runner-prod
+    - if: $CI_COMMIT_BRANCH == "test_kube"
+  tags:
+    - runner-test-kube
   script:
-  - export KUBECONFIG="$KUBECONFIG_CONTENT"
-  - NODES_FOUND=$(kubectl get nodes -l feature.node.kubernetes.io/rust=true -o jsonpath='{.items[*].metadata.name}')
-  - |
-    if [ -z "$NODES_FOUND" ]; then
-      echo "ENV_TAG=-lts" >> build.env
-    else
-      echo "ENV_TAG=" >> build.env
-    fi
-  - echo "VERSION_TAG=$VERSION_TAG" >> build.env
+    - !reference [.sript-check-processor, script]
+  artifacts:
+    reports:
+      dotenv: build.env
+
+check-processor-prod:
+  stage: check-env
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  tags:
+    - runner-prod
+  script:
+    - !reference [.sript-check-processor, script]
   artifacts:
     reports:
       dotenv: build.env
@@ -110,10 +123,10 @@ deploy_to_test-kube:
   stage: deploy-test
   needs:
     - job: build_job
-    - job: check-env_job
+    - job: check-processor-test
       artifacts: true
   dependencies:
-    - check-env_job
+    - check-processor-test
   tags:
     - runner-test-kube
   environment:
@@ -127,10 +140,10 @@ deploy_to_prod:
   stage: deploy-prod
   needs:
     - job: build_job
-    - job: check-env_job
+    - job: ccheck-processor-prod
       artifacts: true
   dependencies:
-    - check-env_job
+    - check-processor-test
   tags:
     - runner-prod
   environment:
