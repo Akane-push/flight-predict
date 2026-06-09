@@ -83,6 +83,8 @@ build_job:
 # Check env  ================================================
 check-env_job:
   stage: check-env
+  tags:
+    - runner-test-kube || runner-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "test_kube"
