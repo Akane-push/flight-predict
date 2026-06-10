@@ -1,39 +1,58 @@
 # Airflow 3 Architecture ================================================
+redis:
+  resources:
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+
+postgresql:
+  resources:
+    limits:
+      cpu: "100m"
+      memory: "200Mi"
+    requests:
+      cpu: "50m"
+      memory: "100Mi"
+
 apiServer:
   replicas: 1
   resources:
     limits:
-      cpu: "500m"
-      memory: "1Gi"
-    requests:
       cpu: "200m"
-      memory: "512Mi"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
 
 scheduler:
   replicas: 1
   resources:
     limits:
-      cpu: "500m"
-      memory: "1Gi"
-    requests:
       cpu: "200m"
-      memory: "512Mi"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+
+dagProcessor:
+  replicas: 1
+  resources:
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
 
 worker:
   replicas: 1
   resources:
     limits:
-      cpu: "500m"
-      memory: "1Gi"
-    requests:
       cpu: "200m"
-      memory: "512Mi"
-
-postgresql:
-  resources:
-    limits:
-      cpu: "500m"
-      memory: "512Mi"
+      memory: "300Mi"
     requests:
-      cpu: "200m"
-      memory: "256Mi"
+      cpu: "50m"
+      memory: "150Mi"

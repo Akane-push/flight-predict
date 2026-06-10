@@ -14,6 +14,13 @@ createUserJob:
 
 redis:
   enabled: true
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
 
 uid: 50000
 gid: 0
@@ -30,7 +37,13 @@ postgresql:
     enabled: true
     storageClassName: "local-storage-db"
     size: "10Gi"
-
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1.2Gi"
+    requests:
+      cpu: "300m"
+      memory: "512Mi"
 
 # Images Configuration ================================================
 images:
@@ -48,7 +61,14 @@ webserver:
   enabled: false
 
 apiServer:
-  replicas: 2
+  replicas: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1.2Gi"
+    requests:
+      cpu: "300m"
+      memory: "512Mi"
   service:
     type: NodePort
     ports:
@@ -58,26 +78,43 @@ apiServer:
         nodePort: 32080
 
 scheduler:
-  replicas: 2
+  replicas: 1
   logGroomerSidecar:
     enabled: false
     command: null
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1.2Gi"
+    requests:
+      cpu: "300m"
+      memory: "512Mi"
 
 dagProcessor:
   replicas: 2
   logGroomerSidecar:
     enabled: false
     command: null
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1.2Gi"
+    requests:
+      cpu: "300m"
+      memory: "512Mi"
 
 
 # Worker Config ================================================
 worker:
   enabled: true
-  replicas: 3
+  replicas: 2
   resources:
     limits:
+      cpu: "1"
+      memory: "1.5Gi"
+    requests:
       cpu: "500m"
-      memory: "1Gi"
+      memory: "512Mi"
 
 
 # DAGS ================================================
