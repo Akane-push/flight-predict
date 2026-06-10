@@ -15,7 +15,7 @@ x-airflow-common: &airflow-common
     - AIRFLOW__API__AUTH_BACKENDS=airflow.providers.fab.auth_manager.api.auth.backend.fab_auth_backend,airflow.api.auth.backend.session
     - AIRFLOW__API_AUTH__JWT_SECRET=${AIRFLOW_API_SECRET:-secret}
     - AIRFLOW__API_AUTH__JWT_ISSUER=${AIRFLOW_API_ISSUER:-issuser}
-    - PYTHONPATH=/opt/airflow/src:/opt/airflow
+    - PYTHONPATH=/opt/airflow/src
     - SERVICE_NAME=airflow
     - TZ=Europe/Paris
     - EXTRACTED_PATH=/opt/airflow/output
