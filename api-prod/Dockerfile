@@ -14,7 +14,7 @@ COPY --chown=apiuser:apiuser src/ ./src/
 
 COPY --chown=apiuser:apiuser ./api-prod/ .
 
-RUN pip install ".[api]"
+RUN pip install --no-cache-dir ".[api]"
 
 USER apiuser
 
