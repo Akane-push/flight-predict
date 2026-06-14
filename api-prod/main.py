@@ -13,7 +13,7 @@ airflow_url = os.getenv("AIRFLOW_API_URL")
 dag_id_flight = "ad_hoc_flight"
 dag_id_weather = "ad_hoc_weather"
 
-#API init
+# API init   ================================================
 http_client: httpx.AsyncClient = None
 
 @asynccontextmanager
@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-#Connexion with Airflow API token
+# Connexion with Airflow API token   ================================================
 security = HTTPBearer()
 
 async def verify_airflow_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
@@ -64,7 +64,7 @@ async def verify_airflow_token(credentials: HTTPAuthorizationCredentials = Depen
             detail=f"[WARNING] Failed to connect to Airflow: {exc}"
         )
 
-#Trigger flight dag
+# Trigger flight dag  ================================================
 @app.post("/trigger-ad_hoc-flight/{date_val}/{time_val}", status_code=status.HTTP_201_CREATED)
 async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[str, Depends(verify_airflow_token)]):
     """Triggers the DAG
@@ -106,7 +106,7 @@ async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[st
             detail=f"[WARNING] Failed to connect to Airflow: {exc}",
         )
 
-#Trigger weather dag
+# Trigger weather dag  ================================================
 @app.post("/trigger-ad_hoc-weather/{date_val}", status_code=status.HTTP_201_CREATED)
 async def trigger_dag_weather(date_val: str, c_token: Annotated[str, Depends(verify_airflow_token)]):
     """Triggers the DAG

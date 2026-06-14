@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if grep -q "avx2" /proc/cpuinfo; then
-    echo "DOCKERFILE=Dockerfile" >> .env
+    echo "\nDOCKERFILE=Dockerfile" >> .env
 else
-    echo "DOCKERFILE=Dockerfile.lts" >> .env
+    echo "\nDOCKERFILE=Dockerfile.lts" >> .env
 fi

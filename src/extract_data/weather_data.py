@@ -19,13 +19,20 @@ pending_path = os.getenv("PENDING_PATH")
 
 filename_flight = "_flightdatas.parquet"
 
-#Open-Meteo config
+# Open-Meteo config  ================================================
 cache_session = requests_cache.CachedSession('.cache', expire_after = -1)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
 class Weather:
-    #Load datas from Open-Meteo API
+    """
+    Class to extract weather data
+    Outputs:
+        - extract_weather(date: str) : extract weather data for a given date
+        - extract_scheduled_weather(self, df_flights: pl.DataFrame) : extract weather data for all flights in a given dataframe
+    """
+
+    # Outputs  ================================================
     def extract_weather(self, date: str):
         """
         date = 'AAAA-MM-DD'
@@ -41,7 +48,7 @@ class Weather:
             self.url = "https://api.open-meteo.com/v1/forecast"
 
         return self.openmeteo_extract()
-    
+
 
     def extract_scheduled_weather(self, df_flights: pl.DataFrame):
         df_IATA = pl.concat([df_flights['Departure_IATA'], df_flights['Arrival_IATA']])
@@ -59,8 +66,24 @@ class Weather:
         self.responses = openmeteo.weather_api(self.url, params = params)
         
         return self.openmeteo_separate()
-    
 
+
+    # Extract IATA list, longitude and latitude  ================================================
+    def loading_datas(self):
+        if os.path.exists(self.file_path):
+            self.df_flight_list = pl.read_parquet(self.file_path)
+            df_IATA = pl.concat([self.df_flight_list['Departure_IATA'], self.df_flight_list['Arrival_IATA']])
+            self.liste_IATA = df_IATA.unique().to_list()
+        
+        else:
+            print(f"[WARNING] No {self.file_name} file existing")
+            return None
+
+        self.df_IATA_l_L = df_IATA_refs.filter(pl.col("Airport_IATA").is_in(self.liste_IATA))
+        self.df_IATA_l_L = self.df_IATA_l_L.drop(self.df_IATA_l_L.columns[:3])
+        return self.df_IATA_l_L
+
+    # Generate data for extract_weather() output  ================================================
     def openmeteo_extract(self):
         if self.load_datas() is None:
             return None
@@ -77,31 +100,14 @@ class Weather:
         
         return self.openmeteo_separate()
 
-    #Load flight data file
+    # Load flight data file  ================================================
     def load_datas(self):
         self.file_name = self.date + filename_flight
         self.file_path = os.path.join(datas_path, self.file_name)
         return self.loading_datas()
 
 
-    #Extract IATA list, longitude and latitude
-    def loading_datas(self):
-        if os.path.exists(self.file_path):
-            self.df_flight_list = pl.read_parquet(self.file_path)
-            df_IATA = pl.concat([self.df_flight_list['Departure_IATA'], self.df_flight_list['Arrival_IATA']])
-            self.liste_IATA = df_IATA.unique().to_list()
-        
-        else:
-            print(f"[WARNING] No {self.file_name} file existing")
-            return None
-
-        self.df_IATA_l_L = df_IATA_refs.filter(pl.col("Airport_IATA").is_in(self.liste_IATA))
-        self.df_IATA_l_L = self.df_IATA_l_L.drop(self.df_IATA_l_L.columns[:3])
-        return self.df_IATA_l_L
-
-
-
-    #Transform Open-Meteo data into a data frame
+    # Transform Open-Meteo data into a DataFrame  ================================================
     def openmeteo_separate(self):
         self.hourly_df = pl.DataFrame()
         for i in range(len(self.responses)):

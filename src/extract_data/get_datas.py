@@ -14,6 +14,14 @@ filename_weather = "_weatherdatas.parquet"
 filename_fids = "_FIDS.parquet"
 
 class GetDatas:
+    """
+    Class Scheduler
+    Outputs:
+        - get_flights(self, time: str) : extract flight data for a given date and save it in a parquet file
+        - get_weather(self) : extract weather data for a given date and save it in a parquet file
+        - get_scheduled_flights(self, time: str, PARAM: str, IATA: str) : (In progress)
+    """
+    
     def __init__(self, date: str):
         """
         date = 'AAAA-MM-DD'
@@ -22,7 +30,7 @@ class GetDatas:
         self.pl = pl
         self.date = date
 
-    #Generate the files for flight
+    # Generate the files for flight  ================================================
     def get_flights(self, time: str):
         """
         time = 'HH:MM'
@@ -47,7 +55,7 @@ class GetDatas:
             self.df_flight_list.write_parquet(file_path)
             print(f"[INFO] Datas are available in the: {file_path} file !")
 
-    #Generate the files for scheduled flights
+    # Generate the files for scheduled flights  ================================================
     def get_scheduled_flights(self, time: str, PARAM: str, IATA: str):
         """
         time = 'HH:MM'
@@ -77,13 +85,8 @@ class GetDatas:
             self.df_clean.write_parquet(file_path)
             print(f"[INFO] Datas are available in the: {file_path} file !")
 
-    #Generate the files for weather
+    # Generate the file for weather  ================================================
     def get_weather(self):
-        self.df_weather = Weather().extract_weather(self.date)
-        self.save_weather()
-
-    #Generate past flight datas
-    def get_archive_weather(self):
         self.df_weather = Weather().extract_weather(self.date)
         self.save_weather()
 

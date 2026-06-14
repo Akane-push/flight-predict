@@ -6,7 +6,7 @@ import polars as pl
 import json
 from src.tools.identification import LufthansaAPI
 
-#Loading required files
+# Loading required files
 current_folder = os.path.dirname(__file__)
 airports_json = os.path.join(current_folder, "..", "reference_data", "study_airport.json")
 with open(airports_json, 'r', encoding='utf-8') as f:
@@ -16,13 +16,19 @@ limit_call_per_hour = 1000
 
 
 class LufthansaFly:
-    #Identification
+        """
+    Class to extract flight data
+    Outputs:
+        - extract_flights(self) : extract flight data for a given date and hour
+        - extract_scheduled_flights(self, PARAM: str, IATA: str) : extract flight data for a given airport and date
+    """
+
+    # Identification  ================================================
     def __init__(self, date: str):
         """
         date = 'AAAA-MM-DDTHH:MM' (Convert to ISO 8601 format with 'T' separator)
         """
         self.date = date
-        #self.service_check()
 
         self.api = LufthansaAPI()
         if self.api.token is None:
@@ -31,17 +37,7 @@ class LufthansaFly:
             self.token = self.api.token
         self.headers = {'Authorization': f'Bearer {self.token}'}
 
-    '''#Change the path depending on the services
-    def service_check(self):
-        service = os.getenv("SERVICE_NAME", "unknown")
-
-        if service == "airflow":
-            return
-
-        else:
-            return'''
-
-    #Get landed flights informations
+    # Get landed flights informations  ================================================
     def extract_flights(self):
         url = f"{self.api.url}/operations/customerflightinformation/arrivals"
         df_flight_list = pl.DataFrame()
@@ -65,7 +61,7 @@ class LufthansaFly:
         return df_flight_list
 
 
-    #Reduces computational load        
+    # Reduces computational load  ================================================
     def flight_filter_generator(self, flights):
         for data in flights:
             if isinstance(data, dict) and data.get("Arrival", {}).get("Status", {}).get("Description") == "Flight Landed":
@@ -95,7 +91,7 @@ class LufthansaFly:
                 'Aircraft_Code': equip_info.get('AircraftCode')
             }
 
-    #Get current flights informations
+    # Get current flights informations  ================================================
     def extract_scheduled_flights(self, PARAM: str, IATA: str):
         '''
         PARAM = "arrivals" or "departures"
@@ -110,7 +106,7 @@ class LufthansaFly:
 
         return df_flights
 
-    #Reduces computational load        
+    # Reduces computational load  ================================================ 
     def flight_current_filter_generator(self, flights):
         for data in flights:
             if isinstance(data, dict) and not data.get("Arrival", {}).get("Status", {}).get("Description") == "Flight Landed" and data.get("Departure", {}).get("Status", {}).get("Description") == "Flight Departed":
