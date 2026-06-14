@@ -6,6 +6,8 @@ RUN pip install polars
 
 COPY --chown=airflow:root pyproject.toml ./
 COPY --chown=airflow:root src/ /opt/airflow/src/
-RUN pip install --no-cache-dir ".[airflow]"
+RUN pip install --no-cache-dir polars ".[airflow]" \
+    && pip install --no-cache-dir --force-reinstall "urllib3==2.6.3" \
+    && pip uninstall -y urllib3-future
 
 COPY --chown=airflow:root ./airflow/dags/ /opt/airflow/dags/
