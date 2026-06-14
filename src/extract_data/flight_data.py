@@ -16,7 +16,7 @@ limit_call_per_hour = 1000
 
 
 class LufthansaFly:
-        """
+    """
     Class to extract flight data
     Outputs:
         - extract_flights(self) : extract flight data for a given date and hour
