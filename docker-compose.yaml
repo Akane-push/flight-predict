@@ -69,7 +69,8 @@ services:
   airflow-init:
     <<: *airflow-common
     command: >
-        bash -c "airflow db migrate &&
+        bash -c "chown -R 50000:0 /opt/airflow/logs &&
+        airflow db migrate &&
         airflow users create
         --username $${AIRFLOW_USER:-admin}
         --firstname admin
@@ -77,6 +78,7 @@ services:
         --role Admin
         --email admin@example.com
         --password $${AIRFLOW_PASSWORD:-admin}"
+        bash -c "chown -R airflow:root /opt/airflow/logs"
     depends_on:
       postgres:
           condition: service_healthy
