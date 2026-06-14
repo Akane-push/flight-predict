@@ -114,6 +114,7 @@ check-processor-prod:
   stage: check-env
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
   tags:
     - runner-prod
   script:
@@ -155,7 +156,6 @@ deploy_to_prod:
       name: serveur-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
   script:
     - !reference [.init-deploy-kube, script]
 

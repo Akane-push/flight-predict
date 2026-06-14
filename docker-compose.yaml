@@ -26,17 +26,18 @@ x-airflow-common: &airflow-common
     - .env
   volumes:
     #- ./src:/opt/airflow/src
-    - ${AIRFLOW_LOGS_PATH:-./airflows/logs}:/opt/airflow/logs
+    - ${AIRFLOW_LOGS_PATH:-./airflow/logs}:/opt/airflow/logs
     - ${EXTRACTED_PATH:-./datas/extracted}:/opt/airflow/output
     - ${PENDING_PATH:-./datas/pending}:/opt/airflow/pending
     - ${ARCHIVES_PATH:-./datas/archives}:/opt/airflow/archives
     - ${MODEL_PATH:-./datas/model}:/opt/airflow/output_model
-  user: "${AIRFLOW_UID:-50000}:0"
+  user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}"
   networks:
   - airflow-network
 
 
 services:
+# Config Airflow  ================================================
   postgres:
     image: postgres:16
     environment:
@@ -64,7 +65,7 @@ services:
     networks:
     - airflow-network
   
-
+# Airflow  ================================================
   airflow-init:
     <<: *airflow-common
     command: >
@@ -147,6 +148,7 @@ services:
       airflow-api-server:
           condition: service_started
 
+# API  ================================================
   api-prod:
     build: 
       context: .
@@ -170,6 +172,7 @@ services:
       - path: .env
         required: false
 
+# Network  ================================================
 networks:
   airflow-network:
     driver: bridge
