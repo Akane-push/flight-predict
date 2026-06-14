@@ -159,25 +159,25 @@ deploy_to_prod:
   script:
     - !reference [.init-deploy-kube, script]
 
-deploy_to_test:
-  stage: deploy-test
-  tags:
-    - runner-test
-  environment:
-      name: serveur-test
-  rules:
-    - if: $CI_COMMIT_BRANCH == "test_server"
-  script:
-    - cp $ENV_FILE .env
-    - echo "Lufth_client_secret=$Lufth_client_secret" >> .env
-    - echo "Lufth_client_id=$Lufth_client_id" >> .env
-    - echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
-    - echo "AIRFLOW_PASSWORD=$AIRFLOW_PASSWORD" >> .env
-    - echo "AIRFLOW_LOGS_PATH=$AIRFLOW_LOGS_PATH" >> .env
-    - echo "AIRFLOW_API_SECRET=$AIRFLOW_API_SECRET" >> .env
-    - echo "EXTRACTED_PATH=$EXTRACTED_PATH" >> .env
-    - echo "PENDING_PATH=$PENDING_PATH" >> .env
-    - echo "ARCHIVES_PATH=$ARCHIVES_PATH" >> .env
-    - echo "MODEL_PATH=$MODEL_PATH" >> .env
-    - docker compose down --remove-orphans
-    - docker compose up -d --build
+# deploy_to_test:
+#   stage: deploy-test
+#   tags:
+#     - runner-test
+#   environment:
+#       name: serveur-test
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "test_server"
+#   script:
+#     - cp $ENV_FILE .env
+#     - echo "Lufth_client_secret=$Lufth_client_secret" >> .env
+#     - echo "Lufth_client_id=$Lufth_client_id" >> .env
+#     - echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
+#     - echo "AIRFLOW_PASSWORD=$AIRFLOW_PASSWORD" >> .env
+#     - echo "AIRFLOW_LOGS_PATH=$AIRFLOW_LOGS_PATH" >> .env
+#     - echo "AIRFLOW_API_SECRET=$AIRFLOW_API_SECRET" >> .env
+#     - echo "EXTRACTED_PATH=$EXTRACTED_PATH" >> .env
+#     - echo "PENDING_PATH=$PENDING_PATH" >> .env
+#     - echo "ARCHIVES_PATH=$ARCHIVES_PATH" >> .env
+#     - echo "MODEL_PATH=$MODEL_PATH" >> .env
+#     - docker compose down --remove-orphans
+#     - docker compose up -d --build
