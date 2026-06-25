@@ -5,6 +5,8 @@ import requests
 import polars as pl
 from src.tools.identification import LufthansaAPI
 
+current_folder = os.path.dirname(__file__)
+datas_ref_path = os.path.join(current_folder, "..", "reference_data")
 wanted_items = 20000 # nb airports to fetch (default 10500 for all)
 #pd.set_option('display.max_rows', wanted_items)
 #pd.set_option('display.max_columns', 10)
@@ -12,7 +14,6 @@ wanted_items = 20000 # nb airports to fetch (default 10500 for all)
 
 class LufthansaRefs:
     def __init__(self):
-        self.datas_ref_path = self.service_check()
         self.api = LufthansaAPI()
         if self.api.token is None:
             self.token = self.api.get_token()
@@ -20,17 +21,7 @@ class LufthansaRefs:
             self.token = self.api.token
         self.headers = {'Authorization': f'Bearer {self.token}'}
 
-    #Change the path depending on the services
-    def service_check(self):
-        service = os.getenv("SERVICE_NAME", "unknown")
-
-        if service == "airflow":
-            return "/opt/airflow/reference_data"
-
-        else:
-            return os.getenv("Datas_ref_path")
-
-    # Airport import
+    # Airport import  ================================================
     def get_airports(self):
         url = f"{self.api.url}/mds-references/airports"
         airports_df = pl.DataFrame()
@@ -48,7 +39,7 @@ class LufthansaRefs:
         airports_df.set_index('Airport_IATA', inplace=True)
         return airports_df
     
-    # Country Name
+    # Country Name  ================================================
     def get_countries(self):
         url = f"{self.api.url}/mds-references/countries"
         countries_df = pl.DataFrame()
@@ -72,8 +63,8 @@ class LufthansaRefs:
             waiting = round(waiting_s / 60 , 0)
             print(f"{outpout} {waiting}m")
 
-    # Get all datas and merge them in a csv file
-    def get_datas(self):
+    # Get all datas and merge them in a csv file  ================================================
+    def get_ref_datas(self):
         name_parquet = "airports_references.parquet"
         file_path = os.path.join(self.datas_ref_path, name_parquet)
         airports_df = self.get_airports()
@@ -90,4 +81,4 @@ class LufthansaRefs:
 
 if __name__ == "__main__":
     LufthansaRefs().waiting_calculation()
-    LufthansaRefs().get_datas()
+    LufthansaRefs().get_ref_datas()
