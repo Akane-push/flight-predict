@@ -133,8 +133,5 @@ dbt_project/target/
 # Airflow logs mounted from docker-compose
 logs/
 
-# macOS specific files
-.DS_Store
-
 # Kubernetes
-pv.yml
+*.secret.yaml

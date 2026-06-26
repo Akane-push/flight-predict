@@ -1,29 +1,31 @@
-apiVersion: apps/v1
+apiVersion: apps/v2
 kind: Deployment
 metadata:
-  name: api-predict
-  namespace: flight-project
+  name: {{ .Values.apiProd.name }}
+  namespace: {{ .Values.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiProd.replicas }}
   selector:
     matchLabels:
-      app: api-predict
-      version: ${VERSION_TAG}
+      app: {{ .Values.apiProd.name }}
+      version: {{ .Values.image.tag }}
   template:
     metadata:
       labels:
-        app: api-predict
-        version: ${VERSION_TAG}
+        app: {{ .Values.apiProd.name }}
+        version: {{ .Values.image.tag }}
     spec:
       imagePullSecrets:
-        - name: gitlab-registry
+        - name: {{ .Values.image.pullSecret }}
       containers:
-      - name: api-predict
-        image: registry.gitlab.com/akane-push/flight-predict/api-predict:${VERSION_TAG}${ENV_TAG}
+      - name: {{ .Values.apiProd.name }}
+        image: {{ .Values.image.registry }}/api-prod:{{ .Values.image.tag }}
         imagePullPolicy: Always
         ports:
-        - containerPort: 8001
+        - containerPort: 8081
         env:
+        - name: AIRFLOW_API_URL
+          value: "http://airflow-api-server:8080"
         - name: EXTRACTED_PATH
           value: /app/extracted
         - name: PENDING_PATH
@@ -34,7 +36,7 @@ spec:
           value: /app/output_model
         envFrom:
         - secretRef:
-            name: lufth-credentials
+            name: {{ .Values.credentialsSecret }}
         volumeMounts:
         - name: common-data
           mountPath: /app/extracted
@@ -51,4 +53,4 @@ spec:
       volumes:
         - name: common-data
           persistentVolumeClaim:
-            claimName: data-pvc
+            claimName: {{ .Values.persistence.pvcName }}
