@@ -81,24 +81,19 @@ helm upgrade --install apis ./k3s/apis \
   --set image.tag=<VERSION_TAG>
 
 # Airflow
-helm upgrade --install airflow apache/airflow \
-  --repo https://airflow.apache.org \
+helm upgrade --install airflow apache-airflow/airflow \
+  --version 1.21.0 \
   -f k3s/airflow/values.yaml \
   --set images.airflow.tag=<VERSION_TAG>
 ```
 
-> `values-test.yaml` applique des restrictions matérielles pour les tests de déploiement.
-
-```bash
-helm upgrade --install airflow apache/airflow \
-  --repo https://airflow.apache.org \
-  -f k3s/airflow/values.yaml \
-  -f k3s/airflow/values-test.yaml \
-  --set images.airflow.tag=<VERSION_TAG>
-```
+> Ajouter`-f k3s/airflow/values-test.yaml` à la commande Airflow pour appliquer des restrictions matérielles.
 
 
 ## Post-Déploiement
+
+Création de l'utilisateur Airflow.
+
 ```bash
 kubectl exec -it -n flight-project deployment/airflow-api-server -- \
   airflow users create \
