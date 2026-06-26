@@ -36,7 +36,7 @@ postgresql:
   persistence:
     enabled: true
     storageClassName: "local-storage-db"
-    size: "10Gi"
+    size: "5Gi"
   resources:
     limits:
       cpu: "1"
@@ -49,11 +49,11 @@ postgresql:
 images:
   airflow:
     repository: "registry.gitlab.com/akane-push/flight-predict/airflow"
-    tag: "${VERSION_TAG}${ENV_TAG}"
+    tag: "latest"
     pullPolicy: "Always"
 
 imagePullSecrets:
-  - name: "gitlab-registry-credentials"
+  - name: "gitlab-registry"
 
 
 # Airflow 3 Architecture ================================================
@@ -145,7 +145,7 @@ logs:
 volumes:
   - name: common-data
     persistentVolumeClaim:
-      claimName: "data-pvc"
+      claimName: "data-pvc" # <-- must match persistence.pvcName in  dans values.yaml
 
 volumeMounts:
   - name: common-data

@@ -1,0 +1,14 @@
+apiVersion: v2
+kind: Service
+metadata:
+  name: {{ .Values.apiPredict.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.apiPredict.name }}
+  ports:
+    - protocol: TCP
+      nodePort: {{ .Values.apiPredict.nodePort }}
+      targetPort: 8001
+      port: 8001
+  type: LoadBalancer
