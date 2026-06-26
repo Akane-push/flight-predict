@@ -179,6 +179,8 @@ deploy_to_prod:
 
   - helm upgrade --install apis ./k3s/apis \
     -f k3s/apis/values.yaml \
+    --set persistence.nodeName=$K3S_NODE_NAME \
+    --set persistence.hostPath=$K3S_HOST_PATH \
     --set image.tag=$VERSION_TAG \
     --set apiPredict.envTag=$ENV_TAG
 
