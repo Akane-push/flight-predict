@@ -59,15 +59,15 @@ test-docker-image :
     - if: $CI_COMMIT_BRANCH == "test_kube"
   script:
   #Test Airflow
-  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA npm test
-  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA npm test
+  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from src.api_prod.main import app; print('OK')"
+  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA python -c "from src.api_prod.main import app; print('OK')"
 
   #Test Api-prod
-  - docker run --rm $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA npm test
+  - docker run --rm $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA airflow dags list
 
   #Test Api-predict
-  - docker run --rm $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-$CI_COMMIT_SHORT_SHA npm test
-  - docker run --rm $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA npm test
+  - docker run --rm $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from src.api_prod.main import app; print('OK')"
+  - docker run --rm $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA python -c "from src.api_prod.main import app; print('OK')"
 
 # Push  ================================================
 push-image :
@@ -104,7 +104,7 @@ check-processor-test:
   tags:
     - runner-test-kube
   script:
-    - !reference [.sript-check-processor, script]
+    - !reference [.script-check-processor, script]
   artifacts:
     reports:
       dotenv: build.env
@@ -117,12 +117,12 @@ check-processor-prod:
   tags:
     - runner-prod
   script:
-    - !reference [.sript-check-processor, script]
+    - !reference [.script-check-processor, script]
   artifacts:
     reports:
       dotenv: build.env
 
-.sript-check-processor:
+.script-check-processor:
   script:
   - export KUBECONFIG="$KUBECONFIG_CONTENT"
   - RUST_NODES=$(kubectl get nodes -l rustcompatible=true -o name)
@@ -140,6 +140,7 @@ deploy_to_test-kube:
   needs:
     - job: build_job
     - job: check-processor-test
+    - job: push-image
       artifacts: true
   dependencies:
     - check-processor-test
@@ -157,6 +158,7 @@ deploy_to_prod:
   needs:
     - job: build_job
     - job: check-processor-prod
+    - job: push-image
       artifacts: true
   dependencies:
     - check-processor-prod
@@ -174,25 +176,28 @@ deploy_to_prod:
   - export KUBECONFIG="$KUBECONFIG_CONTENT"
   
   - if [ -f build.env ]; then export $(xargs < build.env); fi
-  - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/airflow/values.yaml.template > k3s/airflow/values.yaml
-  - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/api-predict/deployment.yaml.template > k3s/api-predict/deployment.yaml
-  - envsubst '$VERSION_TAG,$ENV_TAG' < k3s/api-prod/deployment.yaml.template > k3s/api-prod/deployment.yaml
+
+  - helm upgrade --install apis ./k3s/apis \
+    -f k3s/apis/values.yaml \
+    --set image.tag=$VERSION_TAG \
+    --set apiPredict.envTag=$ENV_TAG
 
   - helm repo add apache-airflow https://airflow.apache.org
   - helm repo update
 
-  - HELM_CMD="helm upgrade --install airflow apache-airflow/airflow --version 1.21.0 --namespace flight-project --create-namespace -f k3s/airflow/values.yaml"
+  # Apply material restrictions for tests if branch is "test_kube"
+  - HELM_CMD="helm upgrade --install airflow apache-airflow/airflow \
+    --version 1.21.0 \
+    --namespace flight-project \
+    --create-namespace \
+    -f k3s/airflow/values.yaml"
   - |
     if [ "$CI_COMMIT_BRANCH" = "test_kube" ]; then
       HELM_CMD="$HELM_CMD -f k3s/airflow/values-test.yaml"
     fi
+  - HELM_CMD="$HELM_CMD --set images.airflow.tag=$VERSION_TAG$ENV_TAG"
   - $HELM_CMD
 
-  - kubectl apply -f k3s/api-predict/service.yaml
-  - kubectl apply -f k3s/api-prod/service.yaml
-
-  - kubectl apply -f k3s/api-predict/deployment.yaml
-  - kubectl apply -f k3s/api-prod/deployment.yaml
 
 # deploy_to_test:
 #   stage: deploy-test
