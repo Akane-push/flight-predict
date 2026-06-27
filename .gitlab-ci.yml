@@ -177,28 +177,31 @@ deploy_to_prod:
   
   - if [ -f build.env ]; then export $(xargs < build.env); fi
 
-  - helm upgrade --install apis ./k3s/apis \
-    -f k3s/apis/values.yaml \
-    --set persistence.nodeName=$K3S_NODE_NAME \
-    --set persistence.hostPath=$K3S_HOST_PATH \
-    --set image.tag=$VERSION_TAG \
-    --set apiPredict.envTag=$ENV_TAG
+  - |
+    helm upgrade --install apis ./k3s/apis \
+      -f k3s/apis/values.yaml \
+      --set persistence.nodeName=$K3S_NODE_NAME \
+      --set persistence.hostPath=$K3S_HOST_PATH \
+      --set image.tag=$VERSION_TAG \
+      --set apiPredict.envTag=$ENV_TAG
 
   - helm repo add apache-airflow https://airflow.apache.org
   - helm repo update
 
   # Apply material restrictions for tests if branch is "test_kube"
-  - HELM_CMD="helm upgrade --install airflow apache-airflow/airflow \
-    --version 1.21.0 \
-    --namespace flight-project \
-    --create-namespace \
-    -f k3s/airflow/values.yaml"
   - |
+    HELM_CMD="helm upgrade --install airflow apache-airflow/airflow \
+      --version 1.21.0 \
+      --namespace flight-project \
+      --create-namespace \
+      -f k3s/airflow/values.yaml"
+
     if [ "$CI_COMMIT_BRANCH" = "test_kube" ]; then
       HELM_CMD="$HELM_CMD -f k3s/airflow/values-test.yaml"
     fi
-  - HELM_CMD="$HELM_CMD --set images.airflow.tag=$VERSION_TAG$ENV_TAG"
-  - $HELM_CMD
+
+    HELM_CMD="$HELM_CMD --set images.airflow.tag=$VERSION_TAG$ENV_TAG"
+    $HELM_CMD
 
 
 # deploy_to_test:
