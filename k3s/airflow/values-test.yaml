@@ -55,7 +55,7 @@ dagProcessor:
   replicas: 1
   livenessProbe:
     periodSeconds: 60
-    timeoutSeconds: 30
+    timeoutSeconds: 60
     failureThreshold: 10
   resources:
     limits:
