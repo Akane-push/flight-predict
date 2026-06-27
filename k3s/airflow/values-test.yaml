@@ -19,6 +19,10 @@ postgresql:
 
 apiServer:
   replicas: 1
+  livenessProbe:
+    periodSeconds: 30
+    timeoutSeconds: 20
+    failureThreshold: 3
   startupProbe:
     failureThreshold: 12
     timeoutSeconds: 30
