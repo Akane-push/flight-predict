@@ -19,40 +19,58 @@ postgresql:
 
 apiServer:
   replicas: 1
+  livenessProbe:
+    periodSeconds: 30
+    timeoutSeconds: 20
+    failureThreshold: 5
+  startupProbe:
+    failureThreshold: 12
+    timeoutSeconds: 30
   resources:
     limits:
       cpu: "200m"
-      memory: "256Mi"
+      memory: "1Gi"
     requests:
       cpu: "50m"
-      memory: "128Mi"
+      memory: "512Mi"
 
 scheduler:
   replicas: 1
+  livenessProbe:
+    periodSeconds: 60
+    timeoutSeconds: 30
+    failureThreshold: 10
+  startupProbe:
+    failureThreshold: 12
+    timeoutSeconds: 30
   resources:
     limits:
       cpu: "200m"
-      memory: "256Mi"
+      memory: "1Gi"
     requests:
       cpu: "50m"
-      memory: "128Mi"
+      memory: "512Mi"
 
 dagProcessor:
   replicas: 1
+  livenessProbe:
+    periodSeconds: 60
+    timeoutSeconds: 60
+    failureThreshold: 10
   resources:
     limits:
       cpu: "200m"
-      memory: "256Mi"
+      memory: "1Gi"
     requests:
       cpu: "50m"
-      memory: "128Mi"
+      memory: "512Mi"
 
 worker:
   replicas: 1
   resources:
     limits:
       cpu: "200m"
-      memory: "300Mi"
+      memory: "512Mi"
     requests:
       cpu: "50m"
       memory: "150Mi"
