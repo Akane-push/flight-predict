@@ -29,7 +29,7 @@ apiServer:
   resources:
     limits:
       cpu: "200m"
-      memory: "256Mi"
+      memory: "1Gi"
     requests:
       cpu: "50m"
       memory: "128Mi"
@@ -42,7 +42,7 @@ scheduler:
   resources:
     limits:
       cpu: "200m"
-      memory: "512Mi"
+      memory: "1Gi"
     requests:
       cpu: "50m"
       memory: "128Mi"
@@ -52,7 +52,7 @@ dagProcessor:
   resources:
     limits:
       cpu: "200m"
-      memory: "512Mi"
+      memory: "1Gi"
     requests:
       cpu: "50m"
       memory: "256Mi"
