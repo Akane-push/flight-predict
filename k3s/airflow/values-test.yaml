@@ -37,9 +37,9 @@ apiServer:
 scheduler:
   replicas: 1
   livenessProbe:
-    periodSeconds: 30
-    timeoutSeconds: 20
-    failureThreshold: 5
+    periodSeconds: 60
+    timeoutSeconds: 30
+    failureThreshold: 10
   startupProbe:
     failureThreshold: 12
     timeoutSeconds: 30
