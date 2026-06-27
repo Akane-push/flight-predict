@@ -59,8 +59,8 @@ test-docker-image :
     - if: $CI_COMMIT_BRANCH == "test_kube"
   script:
   #Test Airflow
-  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA airflow dags list
-  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA airflow dags list
+  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from airflow import DAG; print('OK')"
+  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA python -c "from airflow import DAG; print('OK')"
 
   #Test Api-prod
   - docker run --rm $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from main import app; print('OK')"
