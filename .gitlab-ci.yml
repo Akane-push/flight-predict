@@ -128,9 +128,9 @@ check-processor-prod:
   - RUST_NODES=$(kubectl get nodes -l rustcompatible=true -o name)
   - |
     if [ -z "$RUST_NODES" ]; then
-      echo "ENV_TAG=" >> build.env
-    else
       echo "ENV_TAG=-lts" >> build.env
+    else
+      echo "ENV_TAG=" >> build.env
     fi
   - echo "VERSION_TAG=$VERSION_TAG" >> build.env
 

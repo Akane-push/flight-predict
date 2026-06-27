@@ -32,7 +32,7 @@ scheduler:
   resources:
     limits:
       cpu: "200m"
-      memory: "256Mi"
+      memory: "512Mi"
     requests:
       cpu: "50m"
       memory: "128Mi"
@@ -42,17 +42,17 @@ dagProcessor:
   resources:
     limits:
       cpu: "200m"
-      memory: "256Mi"
+      memory: "512Mi"
     requests:
       cpu: "50m"
-      memory: "128Mi"
+      memory: "256Mi"
 
 worker:
   replicas: 1
   resources:
     limits:
       cpu: "200m"
-      memory: "300Mi"
+      memory: "512Mi"
     requests:
       cpu: "50m"
       memory: "150Mi"
