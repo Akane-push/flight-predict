@@ -38,7 +38,19 @@ k3s/
    kubectl create namespace flight-project
    ```
 
-3. **Secret pour le pull des images (exemple avec GitLab)** :
+   > **Optionnel** — Si le nœud dispose d'un processeur compatible Rust, ajoute le label suivant (remplace `<node-name>` par le nom de ton nœud) :
+  ```bash
+   kubectl label <node-name>  rustcompatible=true --overwrite
+  ```
+
+3. **Créer le secret pour l'API predict**
+   ```bash
+   kubectl create secret generic auth-api \
+    --from-literal=API_KEY=<votre-mot-de-passe> \
+    --namespace=flight-project
+    ```
+
+4. **Secret pour le pull des images (exemple avec GitLab)** :
    ```bash
    kubectl create secret generic gitlab-registry \
      --from-literal=GITLAB_CLIENT_ID=<votre-username-gitlab> \
@@ -46,7 +58,7 @@ k3s/
      --namespace=flight-project
    ```
 
-4. **Compte Lufthansa Developer** : Une inscription est obligatoire pour obtenir les clés d'accès.
+5. **Compte Lufthansa Developer** : Une inscription est obligatoire pour obtenir les clés d'accès.
    - Lien : [Lufthansa API](https://developer.lufthansa.com/io-docs)
    ```bash
    kubectl create secret generic lufth-credentials \

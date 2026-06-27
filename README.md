@@ -63,10 +63,11 @@ AIRFLOW_PASSWORD=admin
 AIRFLOW_LOGS_PATH=
 AIRFLOW_API_ISSUER=
 AIRFLOW_API_SECRET=
-AIRFLOW_UID=50000 # Évite l'erreur ModuleNotFoundError/PermissionError lors des imports Python (urllib3).
+AIRFLOW_UID=50000           # Évite l'erreur ModuleNotFoundError/PermissionError lors des imports Python (urllib3).
 
 # --- Config ---
-DOCKERFILE=Dockerfile.lts # Retirez le ".lts" uniquement si votre processeur est compatible avec le langage Rust.
+API_KEY=                    # Mot de passe pour l'API predict
+DOCKERFILE=Dockerfile.lts   # Retirez le ".lts" uniquement si votre processeur est compatible avec le langage Rust.
 # Si vous n'êtes pas sûr, vous pouvez supprimer cette ligne et lancer le script lts-check.sh à la racine de ce dossier.
 
 # --- Chemins de stockage ---

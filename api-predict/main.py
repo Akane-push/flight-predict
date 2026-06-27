@@ -1,11 +1,18 @@
-import httpx
-from fastapi import FastAPI, HTTPException, Request, status
-from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Request,  Depends
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from src.tools.api_key_auth import verify_api_key
+from src.tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
 import json
 from importlib import resources
 import polars as pl
 
+# API init   ================================================
 app = FastAPI()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 iata_path = resources.files("src.reference_data").joinpath("study_airport.json")
 
@@ -17,5 +24,5 @@ df_airports = pl.read_parquet(resources.files("src.reference_data").joinpath("ai
 airports_list = df_airports.filter(pl.col("Airport_IATA").is_in(iata_list))
 
 @app.get("/available_airports")
-def get_items():
+def get_items(request: Request, api_key: str = Depends(verify_api_key)):
     return airports_list.to_dicts()

@@ -25,3 +25,4 @@ apiPredict:
  
 # Secret  ================================================
 credentialsSecret: lufth-credentials
+apiAuthSecret: auth-api

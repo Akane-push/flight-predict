@@ -1353,7 +1353,7 @@ description = "Python @deprecated decorator to deprecate old python classes, fun
 optional = true
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 groups = ["main"]
-markers = "extra == \"airflow\""
+markers = "extra == \"api\" or extra == \"airflow\""
 files = [
     {file = "deprecated-1.3.1-py2.py3-none-any.whl", hash = "sha256:597bfef186b6f60181535a29fbe44865ce137a5079f295b479886c82729d5f3f"},
     {file = "deprecated-1.3.1.tar.gz", hash = "sha256:b1b50e0ff0c1fddaa5708a2c6b0a6588bb09b892825ab2b214ac9ea9d92a5223"},
@@ -2655,7 +2655,7 @@ description = "Rate limiting utilities"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"airflow\""
+markers = "extra == \"api\" or extra == \"airflow\""
 files = [
     {file = "limits-5.8.0-py3-none-any.whl", hash = "sha256:ae1b008a43eb43073c3c579398bd4eb4c795de60952532dc24720ab45e1ac6b8"},
     {file = "limits-5.8.0.tar.gz", hash = "sha256:c9e0d74aed837e8f6f50d1fcebcf5fd8130957287206bc3799adaee5092655da"},
@@ -3618,7 +3618,7 @@ description = "Core utilities for Python packages"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"airflow\""
+markers = "extra == \"api\" or extra == \"airflow\""
 files = [
     {file = "packaging-26.2-py3-none-any.whl", hash = "sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e"},
     {file = "packaging-26.2.tar.gz", hash = "sha256:ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661"},
@@ -5340,6 +5340,25 @@ files = [
 ]
 
 [[package]]
+name = "slowapi"
+version = "0.1.10"
+description = "A rate limiting extension for Starlette and Fastapi"
+optional = true
+python-versions = "<4.0,>=3.7"
+groups = ["main"]
+markers = "extra == \"api\""
+files = [
+    {file = "slowapi-0.1.10-py3-none-any.whl", hash = "sha256:3acb61561dc9d687e3d3669362ff6a439de9ba44e2fed3a9c165da26b4b83e28"},
+    {file = "slowapi-0.1.10.tar.gz", hash = "sha256:d320d5bc04d9f171a77fb16700faf3036d85b00f420f22924c8a225f95bd14f9"},
+]
+
+[package.dependencies]
+limits = ">=2.3"
+
+[package.extras]
+redis = ["redis (>=3.4.1,<4.0.0)"]
+
+[[package]]
 name = "sniffio"
 version = "1.3.1"
 description = "Sniff out which async library your code is running under"
@@ -6167,7 +6186,7 @@ description = "Module for decorators, wrappers and monkey patching."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"airflow\""
+markers = "extra == \"api\" or extra == \"airflow\""
 files = [
     {file = "wrapt-2.1.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:4b7a86d99a14f76facb269dc148590c01aaf47584071809a70da30555228158c"},
     {file = "wrapt-2.1.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:a819e39017f95bf7aede768f75915635aa8f671f2993c036991b8d3bfe8dbb6f"},
@@ -6457,9 +6476,9 @@ type = ["pytest-mypy"]
 
 [extras]
 airflow = ["airflow-serde-polars", "apache-airflow", "apache-airflow-providers-cncf-kubernetes", "apache-airflow-providers-fab", "apache-airflow-task-sdk", "urllib3"]
-api = ["fastapi", "httpx", "uvicorn"]
+api = ["fastapi", "httpx", "slowapi", "uvicorn"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "1efa7de35c14e43b3d9db62f9504e5f07c0c58da44c559dbdca95893fedd9248"
+content-hash = "8d89616a2fc7c1261239483cd2f3998d0e57024b0600195d578717e8154d5ac6"

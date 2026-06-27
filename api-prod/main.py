@@ -1,13 +1,14 @@
+import os
 import httpx
 import datetime
-from fastapi import FastAPI, HTTPException, Request, status, Depends
-from typing import Any, Dict, Optional, Annotated
+from fastapi import FastAPI, HTTPException, Request, Depends
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from src.tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
+from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from contextlib import asynccontextmanager
-import os
-from dotenv import load_dotenv
 from src.api_tools.exception import validate_date_format, validate_time_format
-
 
 airflow_url = os.getenv("AIRFLOW_API_URL")
 dag_id_flight = "ad_hoc_flight"
@@ -28,6 +29,10 @@ async def lifespan(app: FastAPI):
     await http_client.aclose()
 
 app = FastAPI(lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # Connexion with Airflow API token   ================================================
 security = HTTPBearer()
@@ -66,7 +71,8 @@ async def verify_airflow_token(credentials: HTTPAuthorizationCredentials = Depen
 
 # Trigger flight dag  ================================================
 @app.post("/trigger-ad_hoc-flight/{date_val}/{time_val}", status_code=status.HTTP_201_CREATED)
-async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[str, Depends(verify_airflow_token)]):
+@limiter.limit("3/minute")
+async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[str, Depends(verify_airflow_token)], request: Request):
     """Triggers the DAG
     Date format YYYY-MM-DD
     Time format HH:mm
@@ -76,10 +82,6 @@ async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[st
 
     now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     url = f"/api/v2/dags/{dag_id_flight}/dagRuns"
-    headers = {
-        "Authorization": f"Bearer {c_token}",
-        "Content-Type": "application/json"
-    }
     
     dag_run_data = {
             "logical_date": now_utc,
@@ -108,7 +110,8 @@ async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[st
 
 # Trigger weather dag  ================================================
 @app.post("/trigger-ad_hoc-weather/{date_val}", status_code=status.HTTP_201_CREATED)
-async def trigger_dag_weather(date_val: str, c_token: Annotated[str, Depends(verify_airflow_token)]):
+@limiter.limit("3/minute")
+async def trigger_dag_weather(date_val: str, c_token: Annotated[str, Depends(verify_airflow_token)], request: Request):
     """Triggers the DAG
     Date format YYYY-MM-DD
     """
@@ -116,10 +119,6 @@ async def trigger_dag_weather(date_val: str, c_token: Annotated[str, Depends(ver
 
     now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     url = f"/api/v2/dags/{dag_id_weather}/dagRuns"
-    headers = {
-        "Authorization": f"Bearer {c_token}",
-        "Content-Type": "application/json"
-    }
     
     dag_run_data = {
             "logical_date": now_utc,

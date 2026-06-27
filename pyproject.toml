@@ -21,6 +21,7 @@ dotenv = "*"
 fastapi = { version = "*", optional = true }
 uvicorn = { version = "*", optional = true }
 httpx = { version = "*", optional = true }
+slowapi = { version = "*", optional = true }
 
 apache-airflow = { version = "3.2.0", optional = true }
 apache-airflow-task-sdk = { version = "1.2.0", optional = true }
@@ -31,7 +32,7 @@ apache-airflow-providers-cncf-kubernetes = { version = "10.17.0", optional = tru
 
 [tool.poetry.extras]
 airflow = ["apache-airflow", "apache-airflow-task-sdk", "apache-airflow-providers-fab", "airflow-serde-polars", "urllib3", "apache-airflow-providers-cncf-kubernetes"]
-api = ["fastapi", "uvicorn", "httpx"]
+api = ["fastapi", "uvicorn", "httpx", "slowapi"]
 
 [build-system]
 requires = ["poetry-core"]

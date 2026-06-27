@@ -35,6 +35,8 @@ spec:
         envFrom:
         - secretRef:
             name: {{ .Values.credentialsSecret }}
+        - secretRef:
+            name: {{ .Values.apiAuthSecret }}
         volumeMounts:
         - name: common-data
           mountPath: /app/extracted
