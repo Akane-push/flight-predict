@@ -54,9 +54,9 @@ scheduler:
 dagProcessor:
   replicas: 1
   livenessProbe:
-    periodSeconds: 30
+    periodSeconds: 60
     timeoutSeconds: 30
-    failureThreshold: 5
+    failureThreshold: 10
   resources:
     limits:
       cpu: "200m"
