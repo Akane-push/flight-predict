@@ -28,6 +28,7 @@ build_job:
   stage: build
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
     - if: $CI_COMMIT_BRANCH == "test_kube"
   image: docker:$DOCKER_VERSION
   tags:
