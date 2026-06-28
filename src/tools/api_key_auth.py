@@ -10,7 +10,7 @@ def verify_api_key(api_key: str = Security(api_key_header)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="[ERROR] Missing API Key"
         )
-    if api_key != os.getenv("AIRPORTS_API_KEY"):
+    if api_key != os.getenv("API_KEY"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="[WARNING] Invalid API Key"
