@@ -1,7 +1,7 @@
 import os
 import httpx
 import datetime
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request, status, Depends
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from src.tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
