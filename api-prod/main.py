@@ -71,7 +71,7 @@ async def verify_airflow_token(credentials: HTTPAuthorizationCredentials = Depen
 
 # Trigger flight dag  ================================================
 @app.post("/trigger-ad_hoc-flight/{date_val}/{time_val}", status_code=status.HTTP_201_CREATED)
-@limiter.limit("3/minute")
+@limiter.limit("10/hour")
 async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[str, Depends(verify_airflow_token)], request: Request):
     """Triggers the DAG
     Date format YYYY-MM-DD
@@ -110,7 +110,7 @@ async def trigger_dag_flight(date_val: str, time_val: str, c_token: Annotated[st
 
 # Trigger weather dag  ================================================
 @app.post("/trigger-ad_hoc-weather/{date_val}", status_code=status.HTTP_201_CREATED)
-@limiter.limit("3/minute")
+@limiter.limit("10/hour")
 async def trigger_dag_weather(date_val: str, c_token: Annotated[str, Depends(verify_airflow_token)], request: Request):
     """Triggers the DAG
     Date format YYYY-MM-DD
