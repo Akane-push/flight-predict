@@ -2,7 +2,6 @@
 stages:
   - build
   - test
-  - push-images
   - check-env
   - deploy-test
   - deploy-prod
@@ -23,8 +22,8 @@ workflow:
     - when: always
 
 
-# Build  ================================================
-build_job:
+# Build & Push ================================================
+build_push_job:
   stage: build
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
@@ -33,69 +32,56 @@ build_job:
   image: docker:$DOCKER_VERSION
   tags:
     - runner-build
+  parallel:
+    matrix:
+      - APP: ["airflow", "api-prod", "api-predict"]
+        DOCKERFILE: ["Dockerfile"]
+      - APP: ["airflow", "api-predict"]
+        DOCKERFILE: ["Dockerfile.lts"]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-  #Build Airflow
-  - docker build -t $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA -f airflow/Dockerfile .
-  - docker build -t $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA -f airflow/Dockerfile.lts .
-  - docker tag $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG
-  - docker tag $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts
+      - |
+        if [ "$DOCKERFILE" = "Dockerfile.lts" ]; then
+          TAG_SUFFIX="-lts"
+        else
+          TAG_SUFFIX=""
+        fi
+      - IMAGE_NAME="$CI_REGISTRY_IMAGE/$APP"
+      - FULL_SHA_TAG="$IMAGE_NAME:$VERSION_TAG$TAG_SUFFIX-$CI_COMMIT_SHORT_SHA"
+      - LATEST_TAG="$IMAGE_NAME:$VERSION_TAG$TAG_SUFFIX"
 
-  #Build Api-prod
-  - docker build -t $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA -f api-prod/Dockerfile .
-  - docker tag $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG
+      - docker build --cache-from $LATEST_TAG -t $FULL_SHA_TAG -t $LATEST_TAG -f $APP/$DOCKERFILE .
 
-  #Build Api-predict
-  - docker build -t $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-$CI_COMMIT_SHORT_SHA -f api-predict/Dockerfile .
-  - docker build -t $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA -f api-predict/Dockerfile.lts .
-  - docker tag $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG
-  - docker tag $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts
+      - docker push $FULL_SHA_TAG
+      - docker push $LATEST_TAG
 
 # Test  ================================================
-test-docker-image :
+test-docker-image:
   stage: test
   tags:
     - runner-build
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "test_kube"
-  script:
-  #Test Airflow
-  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from airflow import DAG; print('OK')"
-  - docker run --rm $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA python -c "from airflow import DAG; print('OK')"
-
-  #Test Api-prod
-  - docker run --rm $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from main import app; print('OK')"
-
-  #Test Api-predict
-  - docker run --rm $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-$CI_COMMIT_SHORT_SHA python -c "from main import app; print('OK')"
-  - docker run --rm $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA python -c "from main import app; print('OK')"
-
-# Push  ================================================
-push-image :
-  stage: push-images
-  tags:
-    - runner-build
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "test_kube"
+  parallel:
+    matrix:
+      - APP: ["airflow", "api-prod", "api-predict"]
+        TAG_SUFFIX: [""]
+      - APP: ["airflow", "api-predict"]
+        TAG_SUFFIX: ["-lts"]
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-  #Push Airflow
-  - docker push $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-$CI_COMMIT_SHORT_SHA
-  - docker push $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA
-  - docker push $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG
-  - docker push $CI_REGISTRY_IMAGE/airflow:$VERSION_TAG-lts
-
-  #Push Api-prod
-  - docker push $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG-$CI_COMMIT_SHORT_SHA
-  - docker push $CI_REGISTRY_IMAGE/api-prod:$VERSION_TAG
-
-  #Push Api-predict
-  - docker push $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-$CI_COMMIT_SHORT_SHA
-  - docker push $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts-$CI_COMMIT_SHORT_SHA
-  - docker push $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG
-  - docker push $CI_REGISTRY_IMAGE/api-predict:$VERSION_TAG-lts
+    - IMAGE="$CI_REGISTRY_IMAGE/$APP:$VERSION_TAG$TAG_SUFFIX-$CI_COMMIT_SHORT_SHA"
+    - docker pull $IMAGE
+    - |
+      if [ "$APP" = "airflow" ]; then
+        CHECK="from airflow import DAG; print('OK')"
+      else
+        CHECK="from main import app; print('OK')"
+      fi
+    - docker run --rm $IMAGE python -c "$CHECK"
 
 # Check env  ================================================
 check-processor-test:
@@ -104,6 +90,8 @@ check-processor-test:
     - if: $CI_COMMIT_BRANCH == "test_kube"
   tags:
     - runner-test-kube
+  environment:
+      name: serveur-test-kube
   script:
     - !reference [.script-check-processor, script]
   artifacts:
@@ -117,6 +105,8 @@ check-processor-prod:
       when: manual
   tags:
     - runner-prod
+  environment:
+      name: serveur-prod
   script:
     - !reference [.script-check-processor, script]
   artifacts:
@@ -139,9 +129,8 @@ check-processor-prod:
 deploy_to_test-kube:
   stage: deploy-test
   needs:
-    - job: build_job
+    - job: build_push_job
     - job: check-processor-test
-    - job: push-image
       artifacts: true
   dependencies:
     - check-processor-test
@@ -157,9 +146,8 @@ deploy_to_test-kube:
 deploy_to_prod:
   stage: deploy-prod
   needs:
-    - job: build_job
+    - job: build_push_job
     - job: check-processor-prod
-    - job: push-image
       artifacts: true
   dependencies:
     - check-processor-prod
