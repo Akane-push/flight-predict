@@ -41,7 +41,7 @@ gitleaks:
         else
           LOG_OPTS="${CI_COMMIT_BEFORE_SHA}..${CI_COMMIT_SHA}"
         fi
-      - gitleaks protect --verbose --log-opts="${LOG_OPTS}" --format=gitlab --report-path=gitleaks-sast-report.json
+      - gitleaks protect --verbose --log-opts="${LOG_OPTS}" --report-format=sarif --report-path=gitleaks-sast-report.json
   artifacts:
     reports:
       sast: gitleaks-sast-report.json
