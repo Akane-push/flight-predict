@@ -1,5 +1,6 @@
 # Config  ================================================
 stages:
+  - security
   - build
   - test
   - check-env
@@ -21,6 +22,30 @@ workflow:
     - if: $CI_COMMIT_BRANCH == "test_server"
     - when: always
 
+# Gitleaks ================================================
+gitleaks:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:latest
+  tags:
+    - runner-build
+  rules:
+    - when: always
+  script:
+      - |
+        if [ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_SHA" ]; then
+          LOG_OPTS="${CI_MERGE_REQUEST_TARGET_BRANCH_SHA}..${CI_COMMIT_SHA}"
+        elif [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$CI_COMMIT_BEFORE_SHA" ]; then
+          LOG_OPTS="-n 10 ${CI_COMMIT_SHA}"
+        else
+          LOG_OPTS="${CI_COMMIT_BEFORE_SHA}..${CI_COMMIT_SHA}"
+        fi
+      - gitleaks protect --verbose --log-opts="${LOG_OPTS}" --format=gitlab --report-path=gitleaks-sast-report.json
+  artifacts:
+    reports:
+      sast: gitleaks-sast-report.json
+    expire_in: 1 week
+    when: always
 
 # Build & Push ================================================
 build_push_job:
@@ -59,6 +84,8 @@ build_push_job:
 # Test  ================================================
 test-docker-image:
   stage: test
+  needs:
+    - job: build_push_job
   tags:
     - runner-build
   rules:
@@ -163,7 +190,7 @@ deploy_to_prod:
 .init-deploy-kube:
   script:
   - export KUBECONFIG="$KUBECONFIG_CONTENT"
-  
+
   - if [ -f build.env ]; then export $(xargs < build.env); fi
 
   - |
