@@ -27,6 +27,7 @@ gitleaks:
   stage: security
   image:
     name: zricethezav/gitleaks:latest
+    entrypoint: [""]
   tags:
     - runner-build
   rules:
