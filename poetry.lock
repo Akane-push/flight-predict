@@ -3954,6 +3954,41 @@ six = "*"
 dev = ["nose", "pipreqs", "twine"]
 
 [[package]]
+name = "prometheus-client"
+version = "0.25.0"
+description = "Python client for the Prometheus monitoring system."
+optional = true
+python-versions = ">=3.9"
+groups = ["main"]
+markers = "extra == \"api\""
+files = [
+    {file = "prometheus_client-0.25.0-py3-none-any.whl", hash = "sha256:d5aec89e349a6ec230805d0df882f3807f74fd6c1a2fa86864e3c2279059fed1"},
+    {file = "prometheus_client-0.25.0.tar.gz", hash = "sha256:5e373b75c31afb3c86f1a52fa1ad470c9aace18082d39ec0d2f918d11cc9ba28"},
+]
+
+[package.extras]
+aiohttp = ["aiohttp"]
+django = ["django"]
+twisted = ["twisted"]
+
+[[package]]
+name = "prometheus-fastapi-instrumentator"
+version = "7.1.0"
+description = "Instrument your FastAPI app with Prometheus metrics"
+optional = true
+python-versions = ">=3.8"
+groups = ["main"]
+markers = "extra == \"api\""
+files = [
+    {file = "prometheus_fastapi_instrumentator-7.1.0-py3-none-any.whl", hash = "sha256:978130f3c0bb7b8ebcc90d35516a6fe13e02d2eb358c8f83887cdef7020c31e9"},
+    {file = "prometheus_fastapi_instrumentator-7.1.0.tar.gz", hash = "sha256:be7cd61eeea4e5912aeccb4261c6631b3f227d8924542d79eaf5af3f439cbe5e"},
+]
+
+[package.dependencies]
+prometheus-client = ">=0.8.0,<1.0.0"
+starlette = ">=0.30.0,<1.0.0"
+
+[[package]]
 name = "propcache"
 version = "0.5.2"
 description = "Accelerated property cache"
@@ -6476,9 +6511,9 @@ type = ["pytest-mypy"]
 
 [extras]
 airflow = ["airflow-serde-polars", "apache-airflow", "apache-airflow-providers-cncf-kubernetes", "apache-airflow-providers-fab", "apache-airflow-task-sdk", "urllib3"]
-api = ["fastapi", "httpx", "slowapi", "uvicorn"]
+api = ["fastapi", "httpx", "prometheus-fastapi-instrumentator", "slowapi", "uvicorn"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "8d89616a2fc7c1261239483cd2f3998d0e57024b0600195d578717e8154d5ac6"
+content-hash = "01082e7ae64b64856b63aae907528db485de02f50149634dbcf106167e5b0df5"
