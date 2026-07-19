@@ -220,6 +220,27 @@ deploy_to_prod:
     HELM_CMD="$HELM_CMD --set images.airflow.tag=$VERSION_TAG$ENV_TAG"
     $HELM_CMD
 
+  # Monitoring
+  - cp monitoring/grafana/provisioning/dashboards/fastapi.json k3s/monitoring/dashboards/fastapi.json
+  - cp monitoring/grafana/provisioning/dashboards/airflow.json k3s/monitoring/dashboards/airflow.json
+
+  - |
+    kubectl create configmap grafana-dashboards \
+      --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
+      --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
+      --namespace monitoring \
+      --dry-run=client -o yaml | kubectl apply -f -
+
+  - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  - helm repo update
+
+  - |
+    helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+      --namespace monitoring \
+      --create-namespace \
+      -f k3s/monitoring/values.yaml \
+      --set grafana.adminPassword=$GF_PASSWORD
+
 
 # deploy_to_test:
 #   stage: deploy-test

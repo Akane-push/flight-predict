@@ -135,3 +135,4 @@ logs/
 
 # Kubernetes
 *.secret.yaml
+k3s/monitoring/dashboards/*.json

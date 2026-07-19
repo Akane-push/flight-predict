@@ -1,0 +1,51 @@
+# Prometheus  ================================================
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      # APIs FastAPI
+      - job_name: 'api-prod'
+        static_configs:
+          - targets: ['api-prod.flight-project.svc.cluster.local:8081']
+
+      - job_name: 'api-predict'
+        static_configs:
+          - targets: ['api-predict.flight-project.svc.cluster.local:8001']
+
+      # Airflow via statsd-exporter
+      - job_name: 'airflow'
+        static_configs:
+          - targets: ['airflow-statsd.flight-project.svc.cluster.local:9102']
+
+# Grafana  ================================================
+grafana:
+  adminPassword: "${GF_PASSWORD}"
+
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: 'flight-predict'
+          orgId: 1
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/flight-predict
+
+  dashboardsConfigMaps:
+    flight-predict: "grafana-dashboards"
+
+  service:
+    type: NodePort
+    nodePort: 32300
+
+# Alertmanager  ================================================
+alertmanager:
+  enabled: false
+
+# Disable unused components  ================================================
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true

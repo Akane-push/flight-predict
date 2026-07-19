@@ -91,6 +91,7 @@ scheduler:
       memory: "512Mi"
 
 dagProcessor:
+  enabled: true
   replicas: 2
   logGroomerSidecar:
     enabled: false
@@ -103,7 +104,6 @@ dagProcessor:
       cpu: "300m"
       memory: "512Mi"
 
-
 # Worker Config ================================================
 worker:
   enabled: true
@@ -115,6 +115,10 @@ worker:
     requests:
       cpu: "500m"
       memory: "512Mi"
+
+# Monitoring ================================================
+statsd:
+  enabled: true
 
 
 # DAGS ================================================
@@ -130,10 +134,6 @@ dags:
     #credentialsSecret: "gitlab-http-credentials"
   persistence:
     enabled: false
-
-dagProcessor:
-  enabled: true
-
 
 # Local Logs STORAGE & Volumes Mounts ================================================
 logs:
