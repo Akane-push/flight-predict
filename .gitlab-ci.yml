@@ -225,14 +225,6 @@ deploy_to_prod:
   - cp monitoring/grafana/provisioning/dashboards/fastapi.json k3s/monitoring/dashboards/fastapi.json
   - cp monitoring/grafana/provisioning/dashboards/airflow.json k3s/monitoring/dashboards/airflow.json
 
-  - |
-    kubectl create configmap grafana-dashboards \
-      --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
-      --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
-      --namespace monitoring \
-      --create-namespace \
-      --dry-run=client -o yaml | kubectl apply -f -
-
   - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
   - helm repo update
 
@@ -243,6 +235,12 @@ deploy_to_prod:
       -f k3s/monitoring/values.yaml \
       --set grafana.adminPassword=$GF_PASSWORD
 
+  - |
+    kubectl create configmap grafana-dashboards \
+      --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
+      --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
+      --namespace monitoring \
+      --dry-run=client -o yaml | kubectl apply -f -
 
 # deploy_to_test:
 #   stage: deploy-test
