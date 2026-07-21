@@ -196,6 +196,8 @@ deploy_to_prod:
 
   - |
     helm upgrade --install apis ./k3s/apis \
+      --namespace flight-project \
+      --create-namespace \
       -f k3s/apis/values.yaml \
       --set persistence.nodeName=$K3S_NODE_NAME \
       --set persistence.hostPath=$K3S_HOST_PATH \
@@ -210,7 +212,6 @@ deploy_to_prod:
     HELM_CMD="helm upgrade --install airflow apache-airflow/airflow \
       --version 1.21.0 \
       --namespace flight-project \
-      --create-namespace \
       -f k3s/airflow/values.yaml"
 
     if [ "$CI_COMMIT_BRANCH" = "test_kube" ]; then
@@ -229,6 +230,7 @@ deploy_to_prod:
       --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
       --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
       --namespace monitoring \
+      --create-namespace \
       --dry-run=client -o yaml | kubectl apply -f -
 
   - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
