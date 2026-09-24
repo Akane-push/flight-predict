@@ -6,7 +6,7 @@ Le dépôt Github est un miroir du projet principal hébergé sur [GitLab](https
 
 ## Objectif
 
-Le système intègrera un pipeline ELT orchestré par Airflow, un stockage au format Parquet et un modèle de machine learnin, entrainé avec scikit-learn. Les données seront consultable à l'aide d'une API FastAPI. 
+Le système intègrera un pipeline ELT orchestré par Airflow, un stockage au format Parquet et un modèle de machine learnin, entrainé avec scikit-learn. Les données seront consultable à l'aide d'une API FastAPI.
 
 ## Prérequis
 
@@ -36,7 +36,7 @@ Le système intègrera un pipeline ELT orchestré par Airflow, un stockage au fo
 ### Phase 3:
 - [x] Pipeline CI
 - [x] Kubernetes
-- [ ] Monitoring (Prometheus + Grafana)
+- [x] Monitoring (Prometheus + Grafana)
 - [ ] Pipeline CD
 
 ---
@@ -76,3 +76,26 @@ PENDING_PATH=./datas/pending
 ARCHIVES_PATH=./datas/archives
 MODEL_PATH=./datas/model
 ```
+
+---
+
+## Arborescence
+
+flight-predict/
+├── airflow/
+│   ├── dags/              # DAGs Airflow (extraction, entraînement modèle)
+│   └── Dockerfile(.lts)
+├── api-predict/           # API FastAPI: Prédictions + liste aéroports
+├── api-prod/              # API FastAPI: Déclenchement des DAGs
+├── k3s/                   # Charts Helm (déploiement K3s)
+│   ├── airflow/
+│   └── apis/
+├── monitoring/             # Config Prometheus, Grafana, StatsD
+├── src/
+│   ├── api_tools/          # FastAPI: Exceptions communes
+│   ├── extract_data/       # Extraction vols / météo
+│   ├── reference_data/     # Données de référence (aéroports, pays)
+│   └── tools/              # FastAPI: Auth., rate limiting | Nettoyage, ML (XGBoost), auth. API externes
+├── .gitlab-ci.yml
+├── docker-compose.yaml
+└── pyproject.toml           # Poetry
