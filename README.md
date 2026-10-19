@@ -2,22 +2,39 @@
 
 Projet personnel de Data Engineering visant à concevoir une architecture de prédiction de retards de vols (Lufthansa, vols directs).
 
-Le dépôt Github est un miroir du projet principal hébergé sur [GitLab](https://gitlab.com/Akane-Push/flight-predict)
+Le dépôt GitHub est un miroir du projet principal hébergé sur [GitLab](https://gitlab.com/Akane-Push/flight-predict).
+
+### Compléments
+- [Architecture du projet](docs/ARCHITECTURE.md)
+- [Documentation pour le déploiement de Kubernetes](k3s/README.md)
+- Infrastructure as Code (Terraform + Ansible): [GitHub](https://github.com/Akane-push/terraform-flight-predict) - [GitLab](https://gitlab.com/Akane-Push/terraform-flight-predict)
 
 ## Objectif
 
-Le système intègrera un pipeline ELT orchestré par Airflow, un stockage au format Parquet et un modèle de machine learnin, entrainé avec scikit-learn. Les données seront consultable à l'aide d'une API FastAPI.
+Le système intègre un pipeline ELT orchestré par Airflow, un stockage au format Parquet et un modèle de machine learning, entraîné avec XGBoost. Les données seront consultables à l'aide d'une API FastAPI.
 
-## Prérequis
+## Arborescence
 
-**Ce projet ne contient pas encore de Fake Datas.** Pour exécuter le code vous devez disposer de vos propres identifiants API.
-
-1.  **Compte Lufthansa Developer** : Une inscription est obligatoire pour obtenir les clés d'accès.
-    -   Lien : [LufthansaAPI](https://developer.lufthansa.com/io-docs)
-2.  **Environnement Local** :
-    -   Docker & Docker Compose (recommandé pour Airflow et PostgreSQL)
-
----
+```text
+flight-predict/
+├── airflow/
+│   └── dags/              # DAGs Airflow (extraction, entraînement modèle)
+├── api-predict/           # API FastAPI: Prédictions + liste aéroports
+├── api-prod/              # API FastAPI: Déclenchement des DAGs
+├── docs/                  # Architecture
+├── k3s/                   # Charts Helm (déploiement K3s)
+│   ├── airflow/
+│   └── apis/
+├── monitoring/             # Config Prometheus, Grafana, StatsD
+├── src/
+│   ├── api_tools/          # FastAPI: Exceptions communes, auth., rate limiting
+│   ├── extract_data/       # Extraction vols / météo
+│   ├── reference_data/     # Données de référence (aéroports, pays)
+│   └── tools/              # Nettoyage, ML (XGBoost), auth. lufthansa
+├── .gitlab-ci.yml
+├── docker-compose.yaml
+└── pyproject.toml          # Poetry
+```
 
 ## Avancement
 
@@ -40,6 +57,15 @@ Le système intègrera un pipeline ELT orchestré par Airflow, un stockage au fo
 - [ ] Pipeline CD
 
 ---
+
+## Prérequis
+
+**Ce projet ne contient pas encore de Fake Datas.** Pour exécuter le code vous devez disposer de vos propres identifiants API.
+
+1.  **Compte Lufthansa Developer** : Une inscription est obligatoire pour obtenir les clés d'accès.
+    -   Lien : [LufthansaAPI](https://developer.lufthansa.com/io-docs)
+2.  **Environnement Local** :
+    -   Docker & Docker Compose (recommandé pour Airflow et PostgreSQL)
 
 ## Configuration
 
@@ -76,26 +102,3 @@ PENDING_PATH=./datas/pending
 ARCHIVES_PATH=./datas/archives
 MODEL_PATH=./datas/model
 ```
-
----
-
-## Arborescence
-
-flight-predict/
-├── airflow/
-│   ├── dags/              # DAGs Airflow (extraction, entraînement modèle)
-│   └── Dockerfile(.lts)
-├── api-predict/           # API FastAPI: Prédictions + liste aéroports
-├── api-prod/              # API FastAPI: Déclenchement des DAGs
-├── k3s/                   # Charts Helm (déploiement K3s)
-│   ├── airflow/
-│   └── apis/
-├── monitoring/             # Config Prometheus, Grafana, StatsD
-├── src/
-│   ├── api_tools/          # FastAPI: Exceptions communes
-│   ├── extract_data/       # Extraction vols / météo
-│   ├── reference_data/     # Données de référence (aéroports, pays)
-│   └── tools/              # FastAPI: Auth., rate limiting | Nettoyage, ML (XGBoost), auth. API externes
-├── .gitlab-ci.yml
-├── docker-compose.yaml
-└── pyproject.toml           # Poetry
