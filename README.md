@@ -102,3 +102,10 @@ PENDING_PATH=./datas/pending
 ARCHIVES_PATH=./datas/archives
 MODEL_PATH=./datas/model
 ```
+
+## Ports (Docker Compose)
+- Airflow: 8080
+- API prod: 8081 (Nécessite de générerer un token Airflow depuis l'interface)
+- API predict: 8001
+- Prometheus: 6090
+- Grafana: 6091
