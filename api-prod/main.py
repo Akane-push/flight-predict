@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Request, status, Depends
 from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
-from src.tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
+from src.api_tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
 from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from contextlib import asynccontextmanager

@@ -4,8 +4,8 @@ from importlib import resources
 import polars as pl
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
-from src.tools.api_key_auth import verify_api_key
-from src.tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
+from src.api_tools.api_key_auth import verify_api_key
+from src.api_tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
 import json
 
 # API init   ================================================

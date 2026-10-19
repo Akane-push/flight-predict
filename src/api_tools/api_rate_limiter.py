@@ -6,8 +6,8 @@ from fastapi.responses import JSONResponse
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["15/minute"])
 
+
 def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
-        status_code=429,
-        content={"detail": f"Too many requests. Limit: {exc.limit}"}
+        status_code=429, content={"detail": f"Too many requests. Limit: {exc.limit}"}
     )
