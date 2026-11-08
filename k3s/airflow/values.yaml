@@ -1,6 +1,6 @@
 # Airflow 3 Celery ================================================
 executor: "CeleryExecutor"
-airflowVersion: "3.2.0"
+airflowVersion: "3.2.2"
 config:
   core:
     dags_folder: "/opt/airflow/dags"

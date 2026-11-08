@@ -210,7 +210,7 @@ deploy_to_prod:
   # Apply material restrictions for tests if branch is "test_kube"
   - |
     HELM_CMD="helm upgrade --install airflow apache-airflow/airflow \
-      --version 1.21.0 \
+      --version 1.22.0 \
       --namespace flight-project \
       -f k3s/airflow/values.yaml"
 
