@@ -131,6 +131,7 @@ check-processor-test:
     - runner-test-kube
   environment:
       name: serveur-test-kube
+  extends: .vault_kubeconfig
   extends: .script-check-processor
 
 check-processor-prod:
@@ -142,10 +143,10 @@ check-processor-prod:
     - runner-prod
   environment:
       name: serveur-prod
+  extends: .vault_kubeconfig
   extends: .script-check-processor
 
 .script-check-processor:
-  extends: .vault_kubeconfig
   script:
   - RUST_NODES=$(kubectl get nodes -l rustcompatible=true -o name)
   - |
@@ -174,7 +175,9 @@ deploy_to_test-kube:
       name: serveur-test-kube
   rules:
     - if: $CI_COMMIT_BRANCH == "test_kube"
-  extends: .init-deploy-kube
+  extends: .vault_kubeconfig
+  script:
+  - !reference [.init-deploy-kube, script]
 
 deploy_to_prod:
   stage: deploy-prod
@@ -190,10 +193,11 @@ deploy_to_prod:
       name: serveur-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-  extends: .init-deploy-kube
+  extends: .vault_kubeconfig
+  script:
+  - !reference [.init-deploy-kube, script]
 
 .init-deploy-kube:
-  extends: .vault_kubeconfig
   script:
   - if [ -f build.env ]; then export $(xargs < build.env); fi
 
