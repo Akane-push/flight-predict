@@ -7,6 +7,11 @@ stages:
   - deploy-test
   - deploy-prod
 
+default:
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: $VAULT_AUTH_ROLE
+
 variables:
   REGISTRY_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHA
   DOCKER_VERSION: "29.0.4"
@@ -189,9 +194,10 @@ deploy_to_prod:
     - !reference [.init-deploy-kube, script]
 
 .init-deploy-kube:
+  secrets:
+    KUBECONFIG:
+      vault: flight-predict/kubeconfig/content@secret
   script:
-  - export KUBECONFIG="$KUBECONFIG_CONTENT"
-
   - if [ -f build.env ]; then export $(xargs < build.env); fi
 
   - |
