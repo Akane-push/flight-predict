@@ -156,6 +156,9 @@ check-processor-prod:
 
 .script-check-processor:
   script:
+  - echo "KUBECONFIG=[${KUBECONFIG}]"
+  - env | grep -E '^VAULT_' | sed 's/=.*/=<set>/' || echo "aucune variable VAULT_*"
+  - !reference [.script-check-processor, script]
   - RUST_NODES=$(kubectl get nodes -l rustcompatible=true -o name)
   - |
     if [ -z "$RUST_NODES" ]; then
