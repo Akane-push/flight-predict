@@ -16,6 +16,11 @@ variables:
   REGISTRY_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHA
   DOCKER_VERSION: "29.0.4"
 
+.vault_kubeconfig:
+  secrets:
+    KUBECONFIG:
+      vault: flight-predict/kubeconfig/content@secret
+
 workflow:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
@@ -147,8 +152,8 @@ check-processor-prod:
       dotenv: build.env
 
 .script-check-processor:
+  extends: .vault_kubeconfig
   script:
-  - export KUBECONFIG="$KUBECONFIG_CONTENT"
   - RUST_NODES=$(kubectl get nodes -l rustcompatible=true -o name)
   - |
     if [ -z "$RUST_NODES" ]; then
@@ -194,9 +199,7 @@ deploy_to_prod:
     - !reference [.init-deploy-kube, script]
 
 .init-deploy-kube:
-  secrets:
-    KUBECONFIG:
-      vault: flight-predict/kubeconfig/content@secret
+  extends: .vault_kubeconfig
   script:
   - if [ -f build.env ]; then export $(xargs < build.env); fi
 
