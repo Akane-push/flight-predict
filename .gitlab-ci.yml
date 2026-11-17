@@ -173,7 +173,7 @@ deploy_to_test-kube:
       name: serveur-test-kube
   rules:
     - if: $CI_COMMIT_BRANCH == "test_kube"
-  extends: init-deploy-kube
+  extends: .init-deploy-kube
 
 deploy_to_prod:
   stage: deploy-prod
@@ -189,7 +189,7 @@ deploy_to_prod:
       name: serveur-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-  extends: init-deploy-kube
+  extends: .init-deploy-kube
 
 .init-deploy-kube:
   extends: .vault_kubeconfig
