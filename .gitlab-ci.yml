@@ -20,6 +20,7 @@ variables:
   secrets:
     KUBECONFIG:
       vault: flight-predict/kubeconfig/content@secret
+      file: true
 
 workflow:
   rules:
