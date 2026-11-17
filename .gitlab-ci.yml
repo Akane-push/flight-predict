@@ -132,7 +132,11 @@ check-processor-test:
   environment:
       name: serveur-test-kube
   extends: .vault_kubeconfig
-  extends: .script-check-processor
+  script:
+  - !reference [.script-check-processor, script]
+  artifacts:
+    reports:
+      dotenv: build.env
 
 check-processor-prod:
   stage: check-env
@@ -144,7 +148,11 @@ check-processor-prod:
   environment:
       name: serveur-prod
   extends: .vault_kubeconfig
-  extends: .script-check-processor
+  script:
+  - !reference [.script-check-processor, script]
+  artifacts:
+    reports:
+      dotenv: build.env
 
 .script-check-processor:
   script:
@@ -156,9 +164,6 @@ check-processor-prod:
       echo "ENV_TAG=" >> build.env
     fi
   - echo "VERSION_TAG=$VERSION_TAG" >> build.env
-  artifacts:
-    reports:
-      dotenv: build.env
 
 # Deploy  ================================================
 deploy_to_test-kube:
