@@ -133,6 +133,8 @@ check-processor-test:
       name: serveur-test-kube
   extends: .vault_kubeconfig
   script:
+  - echo "KUBECONFIG=[${KUBECONFIG}]"
+  - env | grep -E '^VAULT_' | sed 's/=.*/=<set>/' || echo "aucune variable VAULT_*"
   - !reference [.script-check-processor, script]
   artifacts:
     reports:
@@ -149,8 +151,6 @@ check-processor-prod:
       name: serveur-prod
   extends: .vault_kubeconfig
   script:
-  - echo "KUBECONFIG=[${KUBECONFIG}]"
-  - env | grep -E '^VAULT_' | sed 's/=.*/=<set>/' || echo "aucune variable VAULT_*"
   - !reference [.script-check-processor, script]
   artifacts:
     reports:
