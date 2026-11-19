@@ -21,7 +21,7 @@ default:
   before_script:
     - apk add --no-cache curl jq
     - |
-      VAULT_TOKEN=$(curl -sf --request POST "$VAULT_SERVER_URL/v1/auth/jwt/login" \
+      VAULT_TOKEN=$(curl -sf --cacert "$VAULT_CA_CERT" --request POST "$VAULT_SERVER_URL/v1/auth/jwt/login" \
         --data "{\"role\":\"$VAULT_AUTH_ROLE\",\"jwt\":\"$VAULT_ID_TOKEN\"}" \
         | jq -r .auth.client_token)
       export VAULT_TOKEN
@@ -80,7 +80,7 @@ debug-vault:
   extends: .vault_login
   script:
     - |
-      TEST_SECRET=$(curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
+      TEST_SECRET=$(curl -sf --cacert "$VAULT_CA_CERT" -H "X-Vault-Token: $VAULT_TOKEN" \
         "$VAULT_SERVER_URL/v1/secret/data/flight-predict/test" | jq -r .data.data.test)
     - echo "longueur=${#TEST_SECRET}"
     - '[ -n "$TEST_SECRET" ] && echo "secret présent" || echo "secret VIDE"'
