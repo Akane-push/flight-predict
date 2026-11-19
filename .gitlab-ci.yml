@@ -1,7 +1,6 @@
 # Config  ================================================
 stages:
   - security
-  - debug-vault
   - build
   - test
   - check-env
@@ -25,13 +24,15 @@ default:
         --data "{\"role\":\"$VAULT_AUTH_ROLE\",\"jwt\":\"$VAULT_ID_TOKEN\"}" \
         | jq -r .auth.client_token)
       export VAULT_TOKEN
-    - '[ -n "$VAULT_TOKEN" ] || { echo "Login Vault échoué"; exit 1; }'
 
 .vault_kubeconfig:
-  secrets:
-    KUBECONFIG:
-      vault: flight-predict/kubeconfig/content@secret
-      file: true
+  before_script:
+    - !reference [.vault_login, before_script]
+    - |
+      KUBECONFIG=$(curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
+        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/kubeconfig" \
+        | jq -r .data.data.content)
+      export KUBECONFIG
 
 workflow:
   rules:
@@ -69,21 +70,6 @@ gitleaks:
       sast: gitleaks-sast-report.json
     expire_in: 1 week
     when: always
-
-# Debug ================================================
-debug-vault:
-  stage: debug-vault
-  tags:
-    - runner-build
-  rules:
-    - when: always
-  extends: .vault_login
-  script:
-    - |
-      TEST_SECRET=$(curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
-        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/test" | jq -r .data.data.test)
-    - echo "longueur=${#TEST_SECRET}"
-    - '[ -n "$TEST_SECRET" ] && echo "secret présent" || echo "secret VIDE"'
 
 # Build & Push ================================================
 build_push_job:
@@ -159,8 +145,6 @@ check-processor-test:
       name: serveur-test-kube
   extends: .vault_kubeconfig
   script:
-  - echo "KUBECONFIG=[${KUBECONFIG}]"
-  - env | grep -E '^VAULT_' | sed 's/=.*/=<set>/' || echo "aucune variable VAULT_*"
   - !reference [.script-check-processor, script]
   artifacts:
     reports:
