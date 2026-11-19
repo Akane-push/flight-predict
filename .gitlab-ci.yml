@@ -232,8 +232,7 @@ deploy_to_prod:
     helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
       --namespace monitoring \
       --create-namespace \
-      -f k3s/monitoring/values.yaml \
-      --set grafana.adminPassword=$GF_PASSWORD
+      -f k3s/monitoring/values.yaml
 
   - |
     kubectl create configmap grafana-dashboards \
