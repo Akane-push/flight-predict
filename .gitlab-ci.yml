@@ -30,7 +30,7 @@ default:
     - !reference [.vault_login, script]
     - |
       curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
-        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/$KUBECONFIG_VAULT_NAME" \
+        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/kubeconfig" \
         | jq -r .data.data.content > "$CI_PROJECT_DIR/.kubeconfig"
     - chmod 600 "$CI_PROJECT_DIR/.kubeconfig"
     - export KUBECONFIG="$CI_PROJECT_DIR/.kubeconfig"
