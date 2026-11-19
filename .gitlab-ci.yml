@@ -1,6 +1,7 @@
 # Config  ================================================
 stages:
   - security
+  - debug-vault
   - build
   - test
   - check-env
@@ -58,6 +59,21 @@ gitleaks:
       sast: gitleaks-sast-report.json
     expire_in: 1 week
     when: always
+
+# Debug ================================================
+debug-vault:
+  stage: debug-vault
+  tags:
+    - runner-build
+  rules:
+    - when: always
+  secrets:
+    TEST_SECRET:
+      vault: flight-predict/test/test@secret
+      file: false
+  script:
+    - echo "longueur=${#TEST_SECRET}"
+    - '[ -n "$TEST_SECRET" ] && echo "secret présent" || echo "secret VIDE"'
 
 # Build & Push ================================================
 build_push_job:
