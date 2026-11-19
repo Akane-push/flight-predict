@@ -146,9 +146,7 @@ check-processor-test:
     - runner-test-kube
   environment:
       name: serveur-test-kube
-  extends: .vault_kubeconfig
-  script:
-  - !reference [.script-check-processor, script]
+  extends: [.vault_kubeconfig, .script-check-processor]
   artifacts:
     reports:
       dotenv: build.env
@@ -162,9 +160,7 @@ check-processor-prod:
     - runner-prod
   environment:
       name: serveur-prod
-  extends: .vault_kubeconfig
-  script:
-  - !reference [.script-check-processor, script]
+  extends: [.vault_kubeconfig, .script-check-processor]
   artifacts:
     reports:
       dotenv: build.env
@@ -195,9 +191,7 @@ deploy_to_test-kube:
       name: serveur-test-kube
   rules:
     - if: $CI_COMMIT_BRANCH == "test_kube"
-  extends: .vault_kubeconfig
-  script:
-  - !reference [.init-deploy-kube, script]
+  extends: [.vault_kubeconfig, .init-deploy-kube]
 
 deploy_to_prod:
   stage: deploy-prod
@@ -213,9 +207,7 @@ deploy_to_prod:
       name: serveur-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-  extends: .vault_kubeconfig
-  script:
-  - !reference [.init-deploy-kube, script]
+  extends: [.vault_kubeconfig, .init-deploy-kube]
 
 .init-deploy-kube:
   script:
