@@ -20,15 +20,10 @@ default:
 .vault_login:
   before_script:
     - apk add --no-cache curl jq ca-certificates
-    - cp "$VAULT_CA_CERT" /usr/local/share/ca-certificates/vault-ca.crt
-    - update-ca-certificates
-    - apk add --no-cache curl jq
     - |
-      VAULT_TOKEN=$(curl -sf --request POST "$VAULT_SERVER_URL/v1/auth/jwt/login" \
-        --data "{\"role\":\"$VAULT_AUTH_ROLE\",\"jwt\":\"$VAULT_ID_TOKEN\"}" \
-        | jq -r .auth.client_token)
-      export VAULT_TOKEN
-    - '[ -n "$VAULT_TOKEN" ] || { echo "Login Vault échoué"; exit 1; }'
+      curl -sS -w "\nHTTP=%{http_code}\n" \
+        --request POST "$VAULT_SERVER_URL/v1/auth/jwt/login" \
+        --data "{\"role\":\"$VAULT_AUTH_ROLE\",\"jwt\":\"$VAULT_ID_TOKEN\"}"
 
 .vault_kubeconfig:
   secrets:
