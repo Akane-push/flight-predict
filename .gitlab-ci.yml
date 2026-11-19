@@ -17,7 +17,7 @@ default:
       aud: $VAULT_AUTH_ROLE
 
 .vault_login:
-  before_script:
+  script:
     - command -v apk >/dev/null && apk add --no-cache curl jq ca-certificates || true
     - |
       VAULT_TOKEN=$(curl -sf --request POST "$VAULT_SERVER_URL/v1/auth/jwt/login" \
@@ -26,8 +26,8 @@ default:
       export VAULT_TOKEN
 
 .vault_kubeconfig:
-  before_script:
-    - !reference [.vault_login, before_script]
+  script:
+    - !reference [.vault_login, script]
     - |
       curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
         "$VAULT_SERVER_URL/v1/secret/data/flight-predict/$KUBECONFIG_VAULT_NAME" \
@@ -146,7 +146,11 @@ check-processor-test:
     - runner-test-kube
   environment:
       name: serveur-test-kube
-  extends: [.vault_kubeconfig, .script-check-processor]
+  script:
+  - !reference [.vault_kubeconfig, script]
+  - !reference [.script-check-processor, script]
+  after_script:
+  - !reference [.vault_kubeconfig, after_script]
   artifacts:
     reports:
       dotenv: build.env
@@ -160,7 +164,11 @@ check-processor-prod:
     - runner-prod
   environment:
       name: serveur-prod
-  extends: [.vault_kubeconfig, .script-check-processor]
+  script:
+  - !reference [.vault_kubeconfig, script]
+  - !reference [.script-check-processor, script]
+  after_script:
+  - !reference [.vault_kubeconfig, after_script]
   artifacts:
     reports:
       dotenv: build.env
@@ -191,7 +199,11 @@ deploy_to_test-kube:
       name: serveur-test-kube
   rules:
     - if: $CI_COMMIT_BRANCH == "test_kube"
-  extends: [.vault_kubeconfig, .init-deploy-kube]
+  script:
+  - !reference [.vault_kubeconfig, script]
+  - !reference [.init-deploy-kube, script]
+  after_script:
+  - !reference [.vault_kubeconfig, after_script]
 
 deploy_to_prod:
   stage: deploy-prod
@@ -207,7 +219,11 @@ deploy_to_prod:
       name: serveur-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-  extends: [.vault_kubeconfig, .init-deploy-kube]
+  script:
+  - !reference [.vault_kubeconfig, script]
+  - !reference [.init-deploy-kube, script]
+  after_script:
+  - !reference [.vault_kubeconfig, after_script]
 
 .init-deploy-kube:
   script:
