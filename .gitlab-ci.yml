@@ -72,8 +72,8 @@ debug-vault:
       vault: flight-predict/test/test@secret
       file: false
   script:
-    - echo "longueur=${#TEST_SECRET}"
-    - '[ -n "$TEST_SECRET" ] && echo "secret présent" || echo "secret VIDE"'
+    - echo "url=[$VAULT_SERVER_URL] role=[$VAULT_AUTH_ROLE]"
+    - '[ -n "$VAULT_ID_TOKEN" ] && echo "id_token présent" || echo "id_token ABSENT"'
 
 # Build & Push ================================================
 build_push_job:
