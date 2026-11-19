@@ -29,10 +29,13 @@ default:
   before_script:
     - !reference [.vault_login, before_script]
     - |
-      KUBECONFIG=$(curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
-        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/kubeconfig" \
-        | jq -r .data.data.content)
-      export KUBECONFIG
+      curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
+        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/$KUBECONFIG_VAULT_NAME" \
+        | jq -r .data.data.content > "$CI_PROJECT_DIR/.kubeconfig"
+    - chmod 600 "$CI_PROJECT_DIR/.kubeconfig"
+    - export KUBECONFIG="$CI_PROJECT_DIR/.kubeconfig"
+  after_script:
+    - rm -f "$CI_PROJECT_DIR/.kubeconfig"
 
 workflow:
   rules:
