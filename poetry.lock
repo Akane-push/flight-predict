@@ -3873,14 +3873,14 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 name = "polars"
 version = "1.40.1"
 description = "Blazingly fast DataFrame library"
-optional = true
+optional = false
 python-versions = ">=3.10"
-groups = ["main"]
-markers = "extra == \"airflow\""
+groups = ["main", "dev"]
 files = [
     {file = "polars-1.40.1-py3-none-any.whl", hash = "sha256:c0f861219d1319cdea45c4ce4d30355a47176b8f98dcedf95ea8269f131b8abd"},
     {file = "polars-1.40.1.tar.gz", hash = "sha256:ab2694134b137596b5a59bfd7b4c54ebbc9b59f9403127f18e32d363777552e8"},
 ]
+markers = {main = "extra == \"airflow\""}
 
 [package.dependencies]
 polars-runtime-32 = "1.40.1"
@@ -3919,10 +3919,9 @@ xlsxwriter = ["xlsxwriter"]
 name = "polars-runtime-32"
 version = "1.40.1"
 description = "Blazingly fast DataFrame library"
-optional = true
+optional = false
 python-versions = ">=3.10"
-groups = ["main"]
-markers = "extra == \"airflow\""
+groups = ["main", "dev"]
 files = [
     {file = "polars_runtime_32-1.40.1-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:b748ef652270cc49e9e69f99a035e0eb4d5f856d42bcd6ac4d9d80a40142aa1e"},
     {file = "polars_runtime_32-1.40.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:d249b3743e05986060cec0a7aaa542d020df6c6b876e556023a310efd581f9be"},
@@ -3934,6 +3933,7 @@ files = [
     {file = "polars_runtime_32-1.40.1-cp310-abi3-win_arm64.whl", hash = "sha256:b5cbfaf6b085b420b4bfcbe24e8f665076d1cccfdb80c0484c02a023ce205537"},
     {file = "polars_runtime_32-1.40.1.tar.gz", hash = "sha256:37f3065615d1bf90d03b5326222df4c5c1f8a5d33e50470aa588e3465e6eb814"},
 ]
+markers = {main = "extra == \"airflow\""}
 
 [[package]]
 name = "prison"
@@ -6517,4 +6517,4 @@ api = ["fastapi", "httpx", "prometheus-fastapi-instrumentator", "slowapi", "uvic
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "f4a3546706262663bf005618bb1ad88e7f8038445b49a416a39ba5c0bf8cf0ec"
+content-hash = "f60e485dd492020084d606d26e325c2e29544a74929c7e5545204b23c32dd0f5"

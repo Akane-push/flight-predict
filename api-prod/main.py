@@ -1,14 +1,16 @@
-import os
-import httpx
 import datetime
-from fastapi import FastAPI, HTTPException, Request, status, Depends
+import os
+from contextlib import asynccontextmanager
+from typing import Annotated
+
+import httpx
+from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+
 from src.api_tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
-from typing import Annotated
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from contextlib import asynccontextmanager
 from src.api_tools.exception import validate_date_format, validate_time_format
 
 airflow_url = os.getenv("AIRFLOW_API_URL")
@@ -57,7 +59,7 @@ async def verify_airflow_token(
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="[WARNING] Invalid or expired Airflow token",
-            )
+            ) from None
 
         elif response.status_code == status.HTTP_403_FORBIDDEN:
             return token
@@ -66,7 +68,7 @@ async def verify_airflow_token(
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail=f"[WARNING] Airflow Auth Error [Status {response.status_code}]: {response.text}",
-            )
+            ) from None
 
         return token
 
@@ -74,13 +76,11 @@ async def verify_airflow_token(
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"[WARNING] Failed to connect to Airflow: {exc}",
-        )
+        ) from exc
 
 
 # Trigger flight dag  ================================================
-@app.post(
-    "/trigger-ad_hoc-flight/{date_val}/{time_val}", status_code=status.HTTP_201_CREATED
-)
+@app.post("/trigger-ad_hoc-flight/{date_val}/{time_val}", status_code=status.HTTP_201_CREATED)
 @limiter.limit("10/hour")
 async def trigger_dag_flight(
     date_val: str,
@@ -95,9 +95,7 @@ async def trigger_dag_flight(
     validate_date_format(date_val)
     validate_time_format(time_val)
 
-    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
+    now_utc = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     url = f"/api/v2/dags/{dag_id_flight}/dagRuns"
 
     dag_run_data = {
@@ -114,7 +112,7 @@ async def trigger_dag_flight(
             raise HTTPException(
                 status_code=response.status_code,
                 detail=f"[WARNING] Airflow API error: {response.text}",
-            )
+            ) from None
 
         return response.json()
 
@@ -122,7 +120,7 @@ async def trigger_dag_flight(
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"[WARNING] Failed to connect to Airflow: {exc}",
-        )
+        ) from exc
 
 
 # Trigger weather dag  ================================================
@@ -138,9 +136,7 @@ async def trigger_dag_weather(
     """
     validate_date_format(date_val)
 
-    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
+    now_utc = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     url = f"/api/v2/dags/{dag_id_weather}/dagRuns"
 
     dag_run_data = {"logical_date": now_utc, "conf": {"date_val": date_val}}
@@ -154,7 +150,7 @@ async def trigger_dag_weather(
             raise HTTPException(
                 status_code=response.status_code,
                 detail=f"[WARNING] Airflow API error: {response.text}",
-            )
+            ) from None
 
         return response.json()
 
@@ -162,4 +158,4 @@ async def trigger_dag_weather(
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"[WARNING] Failed to connect to Airflow: {exc}",
-        )
+        ) from exc

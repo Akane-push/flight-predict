@@ -1,10 +1,11 @@
-from dotenv import load_dotenv
 import os
+
 import requests
-import json
+from dotenv import load_dotenv
 
 # Load from .env file
 load_dotenv()
+
 
 class LufthansaAPI:
     def __init__(self):
@@ -17,18 +18,20 @@ class LufthansaAPI:
     # Token retrieval method
     def get_token(self):
         url = f"{self.url}/oauth/token"
-        response = requests.post(url, data={
-                                                'client_id': self.client_id,
-                                                'client_secret': self.client_secret,
-                                                'grant_type': 'client_credentials'
-                                            })
+        response = requests.post(
+            url,
+            data={
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "grant_type": "client_credentials",
+            },
+        )
         if response.status_code == 200:
-            self.token = response.json()['access_token']
+            self.token = response.json()["access_token"]
             print("[INFO] Successfully authenticated with Lufthansa API.")
             return self.token
         else:
             raise PermissionError(f"[ERROR] : {response.status_code} - {response.text}")
-
 
 
 if __name__ == "__main__":
@@ -37,5 +40,4 @@ if __name__ == "__main__":
     print(f"Token d'accès : {lufthansa_api.token}")
 
 
-
-#401 token invalid
+# 401 token invalid

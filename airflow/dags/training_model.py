@@ -1,13 +1,16 @@
+from datetime import timedelta
+
 import pendulum
-from airflow.sdk import dag, task
 from airflow.providers.standard.operators.bash import BashOperator
-from datetime import datetime, timedelta
+from airflow.sdk import dag, task
+
 from src.tools.XGBoost_GridSearch import XGBGridSearch
 
+
 @dag(
-    dag_id='training_model',
-    description='Launch training model',
-    schedule="0 2 * * 0", 
+    dag_id="training_model",
+    description="Launch training model",
+    schedule="0 2 * * 0",
     start_date=pendulum.datetime(2024, 5, 10, tz=pendulum.timezone("Europe/Paris")),
     catchup=False,
     max_active_runs=1,
@@ -15,15 +18,14 @@ from src.tools.XGBoost_GridSearch import XGBGridSearch
         "retries": 3,
         "retry_delay": timedelta(minutes=19),
     },
-    tags=['model', 'training'],
+    tags=["model", "training"],
     doc_md="""
     ### Training & Archiving Pipeline
     Archeving old flight and weather files
-    """
+    """,
 )
-
 def training_process():
-    
+
     @task(task_id="launch_training")
     def launch_training():
         training_class = XGBGridSearch().training_model()
@@ -36,5 +38,6 @@ def training_process():
 
     training_results = launch_training()
     training_results >> archiving_files
+
 
 training_process()

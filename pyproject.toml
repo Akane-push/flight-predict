@@ -35,6 +35,22 @@ apache-airflow-providers-cncf-kubernetes = { version = "10.17.0", optional = tru
 airflow = ["apache-airflow", "apache-airflow-task-sdk", "apache-airflow-providers-fab", "airflow-serde-polars", "urllib3", "apache-airflow-providers-cncf-kubernetes"]
 api = ["fastapi", "uvicorn", "httpx", "slowapi", "prometheus-fastapi-instrumentator"]
 
+[tool.poetry.group.dev.dependencies]
+polars = "*"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends"]

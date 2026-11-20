@@ -1,12 +1,14 @@
-from fastapi import FastAPI, Request, Depends
-from prometheus_fastapi_instrumentator import Instrumentator
+import json
 from importlib import resources
+
 import polars as pl
+from fastapi import Depends, FastAPI, Request
+from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+
 from src.api_tools.api_key_auth import verify_api_key
 from src.api_tools.api_rate_limiter import limiter, rate_limit_exceeded_handler
-import json
 
 # API init   ================================================
 app = FastAPI()

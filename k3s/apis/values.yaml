@@ -1,11 +1,11 @@
 namespace: flight-project
- 
+
 # Environement  ================================================
 persistence:
   size: 10Gi
   storageClassName: local-storage
   pvcName: data-pvc
- 
+
 # Images  ================================================
 image:
   registry: registry.gitlab.com/akane-push/flight-predict
@@ -22,7 +22,7 @@ apiPredict:
   nodePort: 32001
   replicas: 1
   envTag: "-lts"
- 
+
 # Secret  ================================================
 credentialsSecret: lufth-credentials
 apiAuthSecret: auth-api
