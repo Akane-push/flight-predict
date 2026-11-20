@@ -50,7 +50,15 @@ k3s/
     --namespace=flight-project
     ```
 
-4. **Secret pour le pull des images (exemple avec GitLab)** :
+4. **Créer le secret pour Grafana** :
+   ```bash
+   kubectl create secret generic auth-grafana \
+     --from-literal=GF_USER=<votre-username> \
+     --from-literal=GF_PASSWORD=<votre-password> \
+     --namespace=flight-project
+   ```
+
+5. **Secret pour le pull des images (exemple avec GitLab)** :
    ```bash
    kubectl create secret generic gitlab-registry \
      --from-literal=GITLAB_CLIENT_ID=<votre-username-gitlab> \
@@ -58,7 +66,7 @@ k3s/
      --namespace=flight-project
    ```
 
-5. **Compte Lufthansa Developer** : Une inscription est obligatoire pour obtenir les clés d'accès.
+6. **Compte Lufthansa Developer** : Une inscription est obligatoire pour obtenir les clés d'accès.
    - Lien : [Lufthansa API](https://developer.lufthansa.com/io-docs)
    ```bash
    kubectl create secret generic lufth-credentials \

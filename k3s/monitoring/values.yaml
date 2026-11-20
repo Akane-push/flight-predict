@@ -18,7 +18,10 @@ prometheus:
 
 # Grafana  ================================================
 grafana:
-  adminPassword: "${GF_PASSWORD}"
+  admin:
+    existingSecret: auth-grafana
+    userKey: GF_USER
+    passwordKey: GF_PASSWORD
 
   dashboardProviders:
     dashboardproviders.yaml:
