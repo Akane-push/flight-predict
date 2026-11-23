@@ -13,10 +13,7 @@ deploy_to_test-kube:
   rules:
     - if: $CI_COMMIT_BRANCH == "test_kube"
   script:
-  - !reference [.vault_kubeconfig, script]
   - !reference [.init-deploy-kube, script]
-  after_script:
-  - !reference [.vault_kubeconfig, after_script]
 
 deploy_to_prod:
   stage: deploy-prod
@@ -33,10 +30,8 @@ deploy_to_prod:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   script:
-  - !reference [.vault_kubeconfig, script]
   - !reference [.init-deploy-kube, script]
-  after_script:
-  - !reference [.vault_kubeconfig, after_script]
+
 
 .init-deploy-kube:
   script:

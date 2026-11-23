@@ -1,4 +1,3 @@
-# Config  ================================================
 stages:
   - security
   - quality
@@ -11,32 +10,6 @@ stages:
 variables:
   REGISTRY_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHA
   DOCKER_VERSION: "29.0.4"
-
-default:
-  id_tokens:
-    VAULT_ID_TOKEN:
-      aud: $VAULT_AUTH_ROLE
-
-.vault_login:
-  script:
-    - command -v apk >/dev/null && apk add --no-cache curl jq ca-certificates || true
-    - |
-      VAULT_TOKEN=$(curl -sf --request POST "$VAULT_SERVER_URL/v1/auth/jwt/login" \
-        --data "{\"role\":\"$VAULT_AUTH_ROLE\",\"jwt\":\"$VAULT_ID_TOKEN\"}" \
-        | jq -r .auth.client_token)
-      export VAULT_TOKEN
-
-.vault_kubeconfig:
-  script:
-    - !reference [.vault_login, script]
-    - |
-      curl -sf -H "X-Vault-Token: $VAULT_TOKEN" \
-        "$VAULT_SERVER_URL/v1/secret/data/flight-predict/kubeconfig" \
-        | jq -r .data.data.content > "$CI_PROJECT_DIR/.kubeconfig"
-    - chmod 600 "$CI_PROJECT_DIR/.kubeconfig"
-    - export KUBECONFIG="$CI_PROJECT_DIR/.kubeconfig"
-  after_script:
-    - rm -f "$CI_PROJECT_DIR/.kubeconfig"
 
 workflow:
   rules:

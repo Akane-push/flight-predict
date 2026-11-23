@@ -7,10 +7,7 @@ check-processor-test:
   environment:
       name: serveur-test-kube
   script:
-  - !reference [.vault_kubeconfig, script]
   - !reference [.script-check-processor, script]
-  after_script:
-  - !reference [.vault_kubeconfig, after_script]
   artifacts:
     reports:
       dotenv: build.env
@@ -25,10 +22,7 @@ check-processor-prod:
   environment:
       name: serveur-prod
   script:
-  - !reference [.vault_kubeconfig, script]
   - !reference [.script-check-processor, script]
-  after_script:
-  - !reference [.vault_kubeconfig, after_script]
   artifacts:
     reports:
       dotenv: build.env
