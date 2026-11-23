@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import openmeteo_requests
 import polars as pl
 import requests_cache
+from airflow.sdk.exceptions import AirflowSkipException
 from dotenv import load_dotenv
 from retry_requests import retry
 
@@ -90,8 +91,7 @@ class Weather:
             self.liste_IATA = df_IATA.unique().to_list()
 
         else:
-            print(f"[WARNING] No {self.file_name} file existing")
-            return None
+            raise AirflowSkipException(f"[WARNING] No {self.file_name} file existing")
 
         self.df_IATA_l_L = df_IATA_refs.filter(pl.col("Airport_IATA").is_in(self.liste_IATA))
         self.df_IATA_l_L = self.df_IATA_l_L.drop(self.df_IATA_l_L.columns[:3])

@@ -25,8 +25,9 @@ from src.extract_data.get_datas import GetDatas
 def extractor():
 
     @task(task_id="extract_weather_archive")
-    def run_extraction(ds):
-        extractor = GetDatas(ds).get_weather()
+    def run_extraction(data_interval_start=None):
+        target = data_interval_start.in_timezone("Europe/Paris").to_date_string()
+        extractor = GetDatas(target).get_weather()
         return extractor
 
     run_extraction()
