@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from airflow.exceptions import AirflowFailException
 from airflow.sdk import dag, task
+from airflow.sdk.exceptions import AirflowFailException
 
 from src.extract_data.get_datas import GetDatas
 

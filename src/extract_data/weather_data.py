@@ -99,8 +99,7 @@ class Weather:
 
     # Generate data for extract_weather() output  ================================================
     def openmeteo_extract(self):
-        if self.load_datas() is None:
-            return None
+        self.load_datas()
 
         params = {
             "latitude": self.df_IATA_l_L["Latitude"].to_list(),
