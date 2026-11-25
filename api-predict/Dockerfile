@@ -14,7 +14,6 @@ COPY --chown=apiuser:apiuser src/ ./src/
 
 COPY --chown=apiuser:apiuser ./api-predict/ .
 
-RUN pip install --no-cache-dir polars
 RUN pip install --no-cache-dir ".[api]"
 
 USER apiuser

@@ -1,7 +1,7 @@
 x-airflow-common: &airflow-common
   build:
     context: .
-    dockerfile: ./airflow/${DOCKERFILE:-Dockerfile.lts}
+    dockerfile: ./airflow/Dockerfile
   environment:
     - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
     - AIRFLOW__CORE__AUTH_MANAGER=airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
@@ -172,7 +172,7 @@ services:
   api-predict:
     build:
       context: .
-      dockerfile: ./api-predict/${DOCKERFILE:-Dockerfile.lts}
+      dockerfile: ./api-predict/Dockerfile
     ports:
       - "8001:8001"
     env_file:

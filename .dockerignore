@@ -1,10 +1,29 @@
+# Cache
 **/__pycache__
 **/*.pyc
 **/*.pyo
 **/*.pyd
-.pytest_cache
-.git
+*.egg-info/
+
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+
+# Environments
+.env
 .venv
-dist
-build
-k3s/**
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# git
+.git*
+
+# Repertories
+dist/
+build/
+k3s/
+docs/

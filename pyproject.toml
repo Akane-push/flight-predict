@@ -8,6 +8,7 @@ packages = [{include = "src"}]
 python = ">=3.11,<3.13"
 requests = "2.32.2"
 
+polars = "*"
 pandas = "*"
 pyarrow = "*"
 scikit-learn = "*"
