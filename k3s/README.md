@@ -50,7 +50,7 @@ k3s/
    kubectl create secret generic auth-grafana \
      --from-literal=GF_USER=<votre-username> \
      --from-literal=GF_PASSWORD=<votre-password> \
-     --namespace=flight-project
+     --namespace=monitoring
    ```
 
 5. **Secret pour le pull des images (exemple avec GitLab)** :
@@ -100,6 +100,24 @@ helm upgrade --install airflow apache-airflow/airflow \
   --version 1.22.0 \
   -f k3s/airflow/values.yaml \
   --set images.airflow.tag=<IMAGE_TAG>
+
+# Monitoring (Prometheus + Grafana)
+cp monitoring/grafana/provisioning/dashboards/fastapi.json k3s/monitoring/dashboards/fastapi.json
+cp monitoring/grafana/provisioning/dashboards/airflow.json k3s/monitoring/dashboards/airflow.json
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+  --version "93.9.0" \
+  --namespace monitoring --create-namespace \
+  -f k3s/monitoring/values.yaml
+
+kubectl create configmap grafana-dashboards \
+  --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
+  --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
+  --namespace monitoring \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 > Ajouter`-f k3s/airflow/values-test.yaml` à la commande Airflow pour appliquer des restrictions matérielles.

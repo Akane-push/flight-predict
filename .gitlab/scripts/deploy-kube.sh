@@ -41,7 +41,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
-  --version "<VERSION_DEJA_DEPLOYEE>" \
+  --version "93.9.0" \
   --namespace monitoring --create-namespace \
   -f k3s/monitoring/values.yaml
 
