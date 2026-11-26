@@ -3,30 +3,24 @@ stages:
   - quality
   - build
   - test
-  - check-env
   - deploy-test
   - deploy-prod
 
 variables:
-  REGISTRY_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH-$CI_COMMIT_SHA
   DOCKER_VERSION: "29.0.4"
 
 workflow:
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main"
-      variables:
-        VERSION_TAG: "latest"
     - if: $CI_COMMIT_BRANCH == "test_kube"
-      variables:
-        VERSION_TAG: "test"
-    - if: $CI_COMMIT_BRANCH == "test_server"
-    - when: always
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
 
 include:
   - local: ".gitlab/checks/gitleaks.yml"
   - local: ".gitlab/checks/lint.yml"
   - local: ".gitlab/pipelines/build.yml"
   - local: ".gitlab/pipelines/test.yml"
-  - local: ".gitlab/checks/check-processor.yml"
   - local: ".gitlab/pipelines/deploy.yml"
-  # - local: ".gitlab/pipelines/compose.yml"

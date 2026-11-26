@@ -38,16 +38,11 @@ k3s/
    kubectl create namespace flight-project
    ```
 
-   > **Optionnel** — Si le nœud dispose d'un processeur compatible Rust, ajoute le label suivant (remplace `<node-name>` par le nom de ton nœud) :
-  ```bash
-   kubectl label <node-name>  rustcompatible=true --overwrite
-  ```
-
 3. **Créer le secret pour l'API predict**
    ```bash
    kubectl create secret generic auth-api \
-    --from-literal=API_KEY=<votre-mot-de-passe> \
-    --namespace=flight-project
+     --from-literal=API_KEY=<votre-mot-de-passe> \
+     --namespace=flight-project
     ```
 
 4. **Créer le secret pour Grafana** :
@@ -98,13 +93,13 @@ Pour un déploiement manuel :
 helm upgrade --install apis ./k3s/apis \
   -f k3s/apis/values.yaml \
   -f k3s/apis/values.secret.yaml \
-  --set image.tag=<VERSION_TAG>
+  --set image.tag=<IMAGE_TAG>
 
 # Airflow
 helm upgrade --install airflow apache-airflow/airflow \
-  --version 1.21.0 \
+  --version 1.22.0 \
   -f k3s/airflow/values.yaml \
-  --set images.airflow.tag=<VERSION_TAG>
+  --set images.airflow.tag=<IMAGE_TAG>
 ```
 
 > Ajouter`-f k3s/airflow/values-test.yaml` à la commande Airflow pour appliquer des restrictions matérielles.

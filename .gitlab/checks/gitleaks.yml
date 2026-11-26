@@ -4,21 +4,17 @@ gitleaks:
     name: ghcr.io/gitleaks/gitleaks:v8.30.0
     entrypoint: [""]
   tags:
-    - runner-build
+    - runner-lint
+  variables:
+    GIT_DEPTH: 0
   rules:
     - when: always
+  interruptible: true
+  timeout: 10 minutes
   script:
-    - |
-      if [ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_SHA" ]; then
-        LOG_OPTS="${CI_MERGE_REQUEST_TARGET_BRANCH_SHA}..${CI_COMMIT_SHA}"
-      elif [ "$CI_COMMIT_BEFORE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$CI_COMMIT_BEFORE_SHA" ]; then
-        LOG_OPTS="-n 10 ${CI_COMMIT_SHA}"
-      else
-        LOG_OPTS="${CI_COMMIT_BEFORE_SHA}..${CI_COMMIT_SHA}"
-      fi
-    - gitleaks git --verbose --log-opts="${LOG_OPTS}" --report-format=sarif --report-path=gitleaks-sast-report.json .
+    - bash .gitlab/scripts/gitleaks.sh
   artifacts:
-    reports:
-      sast: gitleaks-sast-report.json
+    paths:
+      - gitleaks-report.sarif
     expire_in: 1 week
     when: always

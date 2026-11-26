@@ -1,32 +1,17 @@
 build_push_job:
   stage: build
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
-    - if: $CI_COMMIT_BRANCH == "test_kube"
   image: docker:$DOCKER_VERSION
   tags:
     - runner-build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "test_kube"
+  timeout: 20 minutes
   parallel:
     matrix:
       - APP: ["airflow", "api-prod", "api-predict"]
-        DOCKERFILE: ["Dockerfile"]
-      - APP: ["airflow", "api-predict"]
-        DOCKERFILE: ["Dockerfile.lts"]
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-      - |
-        if [ "$DOCKERFILE" = "Dockerfile.lts" ]; then
-          TAG_SUFFIX="-lts"
-        else
-          TAG_SUFFIX=""
-        fi
-      - IMAGE_NAME="$CI_REGISTRY_IMAGE/$APP"
-      - FULL_SHA_TAG="$IMAGE_NAME:$VERSION_TAG$TAG_SUFFIX-$CI_COMMIT_SHORT_SHA"
-      - LATEST_TAG="$IMAGE_NAME:$VERSION_TAG$TAG_SUFFIX"
-
-      - docker build --cache-from $LATEST_TAG -t $FULL_SHA_TAG -t $LATEST_TAG -f $APP/$DOCKERFILE .
-
-      - docker push $FULL_SHA_TAG
-      - docker push $LATEST_TAG
+    - SHA_TAG="$CI_REGISTRY_IMAGE/$APP:$CI_COMMIT_SHORT_SHA"
+    - docker build -t "$SHA_TAG" -f "$APP/Dockerfile" .
+    - docker push "$SHA_TAG"

@@ -1,10 +1,24 @@
+.lint_base:
+  stage: quality
+  tags:
+    - runner-lint
+  rules:
+    - if: $CI_COMMIT_BRANCH == "test_kube" && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "test_kube"
+  interruptible: true
+  timeout: 10 minutes
+
 lint_python:
   extends: .lint_base
   image:
     name: ghcr.io/astral-sh/ruff:0.17.6-alpine
     entrypoint: [""]
   script:
-    - ruff check . --output-format=gitlab > gl-code-quality-report.json || ruff check .
+    - ruff check . --output-format=gitlab --output-file=gl-code-quality-report.json --exit-zero
+    - ruff check .
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
@@ -13,25 +27,23 @@ lint_python:
 
 hadolint:
   extends: .lint_base
-  image: hadolint/hadolint:latest-debian
+  image: hadolint/hadolint:v2.15.1-debian
   script:
-    - hadolint --failure-threshold error airflow/Dockerfile* api-prod/Dockerfile* api-predict/Dockerfile*
+    - hadolint --failure-threshold error airflow/Dockerfile api-prod/Dockerfile api-predict/Dockerfile
 
 helm-lint:
   extends: .lint_base
   image:
-    name: alpine/helm:3
+    name: alpine/helm:3.11.1
     entrypoint: [""]
   script:
     - helm lint k3s/apis -f k3s/apis/values.yaml
     - helm template apis k3s/apis -f k3s/apis/values.yaml > /dev/null
 
-.lint_base:
-  stage: quality
-  image: python:3.11-slim
-  tags:
-    - runner-build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "test_kube"
+shellcheck:
+  extends: .lint_base
+  image:
+    name: koalaman/shellcheck-alpine:v0.10.0
+    entrypoint: [""]
+  script:
+    - shellcheck .gitlab/scripts/*.sh
