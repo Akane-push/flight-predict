@@ -15,7 +15,7 @@ helm upgrade --install apis ./k3s/apis \
   --set persistence.nodeName="${K3S_NODE_NAME}" \
   --set persistence.hostPath="${K3S_HOST_PATH}" \
   --set image.tag="${IMAGE_TAG}" \
-  --atomic --timeout 5m
+  --rollback-on-failure --timeout 5m
 
 helm repo add apache-airflow https://airflow.apache.org
 helm repo update
