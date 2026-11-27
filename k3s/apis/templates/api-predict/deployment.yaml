@@ -8,7 +8,6 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.apiPredict.name }}
-      version: {{ .Values.image.tag }}
   template:
     metadata:
       labels:
