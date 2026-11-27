@@ -2,8 +2,6 @@ FROM apache/airflow:3.2.2-python3.11
 
 USER airflow
 
-RUN pip install polars
-
 COPY --chown=airflow:root pyproject.toml ./
 COPY --chown=airflow:root src/ /opt/airflow/src/
 RUN pip install --no-cache-dir ".[airflow]"

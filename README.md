@@ -17,6 +17,9 @@ Le système intègre un pipeline ELT orchestré par Airflow, un stockage au form
 
 ```text
 flight-predict/
+├── .gitlab/
+│   ├── check/             # Checks qualité et sécurité (gitleaks, ruff, lint)
+│   └── pipelines/         # Modules CI/CD (build, tests d'image, déploiement)
 ├── airflow/
 │   └── dags/              # DAGs Airflow (extraction, entraînement modèle)
 ├── api-predict/           # API FastAPI: Prédictions + liste aéroports
@@ -51,10 +54,11 @@ flight-predict/
 - [ ] FastAPI - Démo (API Demo)
 
 ### Phase 3:
-- [x] Pipeline CI
+- [x] Pipeline CI (Build, Lint & Sécurité)
+- [x] Pipeline CD
 - [x] Kubernetes
 - [x] Monitoring (Prometheus + Grafana)
-- [ ] Pipeline CD
+- [ ] Pipeline CI (Tests applicatifs)
 
 ---
 
@@ -93,8 +97,6 @@ AIRFLOW_UID=50000           # Évite l'erreur ModuleNotFoundError/PermissionErro
 
 # --- Config ---
 API_KEY=                    # Mot de passe pour l'API predict
-DOCKERFILE=Dockerfile.lts   # Retirez le ".lts" uniquement si votre processeur est compatible avec le langage Rust.
-# Si vous n'êtes pas sûr, vous pouvez supprimer cette ligne et lancer le script lts-check.sh à la racine de ce dossier.
 
 # --- Chemins de stockage ---
 EXTRACTED_PATH=./datas/extracted

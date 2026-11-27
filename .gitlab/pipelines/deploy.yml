@@ -2,84 +2,32 @@ deploy_to_test-kube:
   stage: deploy-test
   needs:
     - job: build_push_job
-    - job: check-processor-test
-      artifacts: true
-  dependencies:
-    - check-processor-test
+    - job: test-docker-image
   tags:
     - runner-test-kube
+  resource_group: test-kube
   environment:
-      name: serveur-test-kube
+    name: serveur-test-kube
   rules:
     - if: $CI_COMMIT_BRANCH == "test_kube"
+  timeout: 15 minutes
+  variables:
+    IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
   script:
-  - !reference [.init-deploy-kube, script]
+    - bash .gitlab/scripts/deploy-kube.sh
 
 deploy_to_prod:
   stage: deploy-prod
-  needs:
-    - job: build_push_job
-    - job: check-processor-prod
-      artifacts: true
-  dependencies:
-    - check-processor-prod
   tags:
     - runner-prod
+  resource_group: prod
   environment:
-      name: serveur-prod
+    name: serveur-prod
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  timeout: 15 minutes
+  variables:
+    IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
   script:
-  - !reference [.init-deploy-kube, script]
-
-
-.init-deploy-kube:
-  script:
-  - if [ -f build.env ]; then export $(xargs < build.env); fi
-
-  - |
-    helm upgrade --install apis ./k3s/apis \
-      --namespace flight-project \
-      --create-namespace \
-      -f k3s/apis/values.yaml \
-      --set persistence.nodeName=$K3S_NODE_NAME \
-      --set persistence.hostPath=$K3S_HOST_PATH \
-      --set image.tag=$VERSION_TAG \
-      --set apiPredict.envTag=$ENV_TAG
-
-  - helm repo add apache-airflow https://airflow.apache.org
-  - helm repo update
-
-  # Apply material restrictions for tests if branch is "test_kube"
-  - |
-    HELM_CMD="helm upgrade --install airflow apache-airflow/airflow \
-      --version 1.22.0 \
-      --namespace flight-project \
-      -f k3s/airflow/values.yaml"
-
-    if [ "$CI_COMMIT_BRANCH" = "test_kube" ]; then
-      HELM_CMD="$HELM_CMD -f k3s/airflow/values-test.yaml"
-    fi
-
-    HELM_CMD="$HELM_CMD --set images.airflow.tag=$VERSION_TAG$ENV_TAG"
-    $HELM_CMD
-
-  # Monitoring
-  - cp monitoring/grafana/provisioning/dashboards/fastapi.json k3s/monitoring/dashboards/fastapi.json
-  - cp monitoring/grafana/provisioning/dashboards/airflow.json k3s/monitoring/dashboards/airflow.json
-
-  - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-  - helm repo update
-
-  - |
-    helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
-      --namespace monitoring \
-      --create-namespace \
-      -f k3s/monitoring/values.yaml
-
-  - |
-    kubectl create configmap grafana-dashboards \
-      --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
-      --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
-      --namespace monitoring \
-      --dry-run=client -o yaml | kubectl apply -f -
+    - bash .gitlab/scripts/deploy-kube.sh

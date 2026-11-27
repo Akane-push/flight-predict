@@ -3880,10 +3880,10 @@ files = [
     {file = "polars-1.40.1-py3-none-any.whl", hash = "sha256:c0f861219d1319cdea45c4ce4d30355a47176b8f98dcedf95ea8269f131b8abd"},
     {file = "polars-1.40.1.tar.gz", hash = "sha256:ab2694134b137596b5a59bfd7b4c54ebbc9b59f9403127f18e32d363777552e8"},
 ]
-markers = {main = "extra == \"airflow\""}
 
 [package.dependencies]
 polars-runtime-32 = "1.40.1"
+polars-runtime-compat = {version = "1.40.1", optional = true, markers = "extra == \"rtcompat\""}
 pyarrow = {version = ">=7.0.0", optional = true, markers = "extra == \"pyarrow\""}
 
 [package.extras]
@@ -3933,7 +3933,25 @@ files = [
     {file = "polars_runtime_32-1.40.1-cp310-abi3-win_arm64.whl", hash = "sha256:b5cbfaf6b085b420b4bfcbe24e8f665076d1cccfdb80c0484c02a023ce205537"},
     {file = "polars_runtime_32-1.40.1.tar.gz", hash = "sha256:37f3065615d1bf90d03b5326222df4c5c1f8a5d33e50470aa588e3465e6eb814"},
 ]
-markers = {main = "extra == \"airflow\""}
+
+[[package]]
+name = "polars-runtime-compat"
+version = "1.40.1"
+description = "Blazingly fast DataFrame library"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:a683d287237f1dcc3dee95b5b2b6408cec318abbbb412ca49206492513be862f"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:c83750f5593cec088134614fbf783fd10c5a92030d71b35f3dea0fff682d92c6"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ffa15c4a8b7f67911412c849dc3d3aac313f682d834eb3f374d0f6cb7e080efc"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e0373dabf942135d13b453d50be7a84b14420b495bd1242570545f58866396e7"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:bcdc488472d2c57dd3315a897456b47cdac222a1520fcf3d8d38410a5bf47ec1"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:34d03962169fc7c0ef6f6efd324d0a51350e7b5abf3b0cd118eb7a32e4d947ec"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-win_amd64.whl", hash = "sha256:d9ccfe58eeb776567cf9556a83b980b9face9f0b1bb629bf2cd2334f4d9daf57"},
+    {file = "polars_runtime_compat-1.40.1-cp310-abi3-win_arm64.whl", hash = "sha256:0c662e6acf5d4e3784eee8e8a1ec6eb185132ac90689cb84034132b5787903b1"},
+    {file = "polars_runtime_compat-1.40.1.tar.gz", hash = "sha256:6149aa764439cec26a5f883fb9921a50f61a0f6c4549df51c735626701a73a18"},
+]
 
 [[package]]
 name = "prison"
@@ -6517,4 +6535,4 @@ api = ["fastapi", "httpx", "prometheus-fastapi-instrumentator", "slowapi", "uvic
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "f60e485dd492020084d606d26e325c2e29544a74929c7e5545204b23c32dd0f5"
+content-hash = "4a97e79016ea2d23b7b3ddba4b6892125ecdc8fdc384073ac91b542fee8ac235"

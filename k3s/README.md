@@ -38,16 +38,11 @@ k3s/
    kubectl create namespace flight-project
    ```
 
-   > **Optionnel** — Si le nœud dispose d'un processeur compatible Rust, ajoute le label suivant (remplace `<node-name>` par le nom de ton nœud) :
-  ```bash
-   kubectl label <node-name>  rustcompatible=true --overwrite
-  ```
-
 3. **Créer le secret pour l'API predict**
    ```bash
    kubectl create secret generic auth-api \
-    --from-literal=API_KEY=<votre-mot-de-passe> \
-    --namespace=flight-project
+     --from-literal=API_KEY=<votre-mot-de-passe> \
+     --namespace=flight-project
     ```
 
 4. **Créer le secret pour Grafana** :
@@ -55,7 +50,7 @@ k3s/
    kubectl create secret generic auth-grafana \
      --from-literal=GF_USER=<votre-username> \
      --from-literal=GF_PASSWORD=<votre-password> \
-     --namespace=flight-project
+     --namespace=monitoring
    ```
 
 5. **Secret pour le pull des images (exemple avec GitLab)** :
@@ -98,13 +93,31 @@ Pour un déploiement manuel :
 helm upgrade --install apis ./k3s/apis \
   -f k3s/apis/values.yaml \
   -f k3s/apis/values.secret.yaml \
-  --set image.tag=<VERSION_TAG>
+  --set image.tag=<IMAGE_TAG>
 
 # Airflow
 helm upgrade --install airflow apache-airflow/airflow \
-  --version 1.21.0 \
+  --version 1.22.0 \
   -f k3s/airflow/values.yaml \
-  --set images.airflow.tag=<VERSION_TAG>
+  --set images.airflow.tag=<IMAGE_TAG>
+
+# Monitoring (Prometheus + Grafana)
+cp monitoring/grafana/provisioning/dashboards/fastapi.json k3s/monitoring/dashboards/fastapi.json
+cp monitoring/grafana/provisioning/dashboards/airflow.json k3s/monitoring/dashboards/airflow.json
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+  --version "93.9.0" \
+  --namespace monitoring --create-namespace \
+  -f k3s/monitoring/values.yaml
+
+kubectl create configmap grafana-dashboards \
+  --from-file=fastapi.json=k3s/monitoring/dashboards/fastapi.json \
+  --from-file=airflow.json=k3s/monitoring/dashboards/airflow.json \
+  --namespace monitoring \
+  --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 > Ajouter`-f k3s/airflow/values-test.yaml` à la commande Airflow pour appliquer des restrictions matérielles.

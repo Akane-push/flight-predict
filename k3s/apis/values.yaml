@@ -21,7 +21,6 @@ apiPredict:
   name: api-predict
   nodePort: 32001
   replicas: 1
-  envTag: "-lts"
 
 # Secret  ================================================
 credentialsSecret: lufth-credentials
